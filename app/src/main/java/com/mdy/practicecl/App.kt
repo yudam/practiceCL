@@ -8,7 +8,7 @@ import android.app.Application
  * Time: 19:30
  */
 class App : Application() {
-    private val TASK :Int= 3
+    private val TASK :Int= 10
 
     override fun onCreate() {
         super.onCreate()
