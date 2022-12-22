@@ -9,6 +9,7 @@ import android.app.Application
  */
 class App : Application() {
 
+    private val TASK :Int= 0
 
     override fun onCreate() {
         super.onCreate()
