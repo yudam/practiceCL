@@ -15,10 +15,11 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI})
 
 
 # 设置头文件搜索路径，这样可以直接添加头文件，而不需要加上头文件的路径
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/include/)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ffmpeg/libyuv/)
+include_directories(${CMAKE_SOURCE_DIR}/include/)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg/)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg/include/)
+include_directories(${CMAKE_SOURCE_DIR}/thirdparty/ffmpeg/libyuv/)
+
 
 # 输出msg
 
@@ -30,22 +31,33 @@ message("ANDROID_ABI:"+${ANDROID_ABI})
 
 
 # 对ffmpeg相关的库设置别名 方便链接
+set(FFMPEG_libavcodec ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavcodec.a)
+set(FFMPEG_libavfilter ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavfilter.a)
+set(FFMPEG_libavformat ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavformat.a)
+set(FFMPEG_libavutil ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavutil.a)
 
-set(FFMPEG_libavfilter ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavfilter.a)
-set(FFMPEG_libavformat ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavformat.a)
-set(FFMPEG_libavcodec ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavcodec.a)
-set(FFMPEG_libpostproc ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libpostproc.a)
-set(FFMPEG_libswresample ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswresample.a)
-set(FFMPEG_libswscale ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswscale.a)
-set(FFMPEG_libavutil ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavutil.a)
-set(FFMPEG_libpostproc ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libpostproc.a)
-set(FFMPEG_libfdk-aac ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libfdk-aac.a)
-set(FFMPEG_libx264 ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libx264.a)
-set(FFMPEG_librtmp ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/librtmp.a)
-set(FFMPEG_libyuv ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libyuv.a)
-set(FFMPEG_libssl ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libssl.a)
-set(FFMPEG_libcrypto ${PROJECT_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libcrypto.a)
+set(FFMPEG_libcrypto ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libcrypto.a)
+set(FFMPEG_libfdk_aac ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libfdk-aac.a)
 
+
+
+set(FFMPEG_libpostproc ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libpostproc.a)
+
+set(FFMPEG_librtmp ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/librtmp.a)
+set(FFMPEG_libssl ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libssl.a)
+
+
+
+set(FFMPEG_libswresample ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswresample.a)
+set(FFMPEG_libswscale ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswscale.a)
+
+
+set(FFMPEG_libx264 ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libx264.a)
+set(FFMPEG_libyuv ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libyuv.a)
+
+
+
+message("FFMPEG_libavcodec:"+${FFMPEG_libavcodec})
 
 # 设置cpp文件的位置 ，方便后面添加
 
@@ -73,15 +85,6 @@ add_library( # Sets the name of the library.
 
 # 添加ffmpeg库
 message("FFMPEG_libcrypto : ${FFMPEG_libcrypto}")
-#add_library(
-#        libavutil
-#        STATIC
-#        IMPORTED)
-#set_target_properties(
-#        libavutil
-#        PROPERTIES IMPORTED_LOCATION
-#        STATIC_LOCATION)
-
 
 
 
@@ -97,13 +100,16 @@ find_library( # Sets the name of the path variable.
         # 指定Cmake需要定位的NDK库的名称
         log)
 
-
 # 编译so时需要链接所有的库，包括本地库、系统库（需要使用${}包裹起来）
 
 target_link_libraries( # Specifies the target library.
 
         # 指定目标库(这里的practicecl指的是我们自己创建的源生库)
         practicecl
+
+        # 不加入下面两个，直接便已报错，原因未知
+        z
+        android
 
         # 链接ffmpeg相关的库
         ${FFMPEG_libavfilter}
@@ -113,8 +119,7 @@ target_link_libraries( # Specifies the target library.
         ${FFMPEG_libswresample}
         ${FFMPEG_libswscale}
         ${FFMPEG_libavutil}
-        ${FFMPEG_libpostproc}
-        ${FFMPEG_libfdk-aac}
+        ${FFMPEG_libfdk_aac}
         ${FFMPEG_libx264}
         ${FFMPEG_librtmp}
         ${FFMPEG_libyuv}

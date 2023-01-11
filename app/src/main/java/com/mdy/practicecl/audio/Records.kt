@@ -37,7 +37,7 @@ class Records {
     init {
         minBufferSize = AudioRecord.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT)
         audioRecord = AudioRecord(MediaRecorder.AudioSource.DEFAULT,
-            sampleRate, AudioFormat.CHANNEL_IN_MONO, AudioFormat.ENCODING_PCM_16BIT,
+            sampleRate, AudioFormat.CHANNEL_IN_STEREO, AudioFormat.ENCODING_PCM_16BIT,
             minBufferSize)
         Log.i(TAG, "minBufferSize: "+minBufferSize)
     }
@@ -68,11 +68,11 @@ class Records {
             while (isRecord) {
                 val mediaData = dataQueue.poll()
                 if(mediaData != null){
-                   // Log.i(TAG, "音频读取    "+mediaData.limit())
+                    Log.i(TAG, "音频读取    "+mediaData.limit())
                     val packet = MediaPacket().apply {
                         data =  mediaData
                     }
-                  //  callback?.frameBuffer(packet)
+                    //callback?.frameBuffer(packet)
                 }
             }
         }

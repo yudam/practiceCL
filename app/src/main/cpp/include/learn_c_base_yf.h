@@ -18,8 +18,7 @@ struct IntModel {
 
 typedef struct CPoint {
 
-    int64_t long_point;
-    uint64_t u_long_point;
+
 
 } CPoint;
 

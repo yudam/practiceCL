@@ -1,10 +1,8 @@
 package com.mdy.practicecl
 
 import android.Manifest
-import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import com.mdy.practicecl.audio.AudioPlayer
 import com.mdy.practicecl.audio.Records
@@ -37,33 +35,38 @@ class MainActivity : AppCompatActivity() {
 
         binding.btn.setOnClickListener {
 
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+//                != PackageManager.PERMISSION_GRANTED) {
+//
+//                Log.i("AudioRecord", "没有 RECORD_AUDIO 权限")
+//                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
+//                    123)
+//            } else {
+//                Log.i("AudioRecord", "有 RECORD_AUDIO 权限")
+//                if (records == null) {
+//                    records = Records()
+//                }
+//                if (!isStart) {
+//                    isStart = true
+//                    records?.startRecording()
+//                    records?.setCallBack(AudioPlayer())
+//                } else {
+//                    isStart = false
+//                    records?.stopRecording()
+//                }
+//            }
 
-                Log.i("AudioRecord", "没有 RECORD_AUDIO 权限")
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO),
-                    123)
-            } else {
-                Log.i("AudioRecord", "有 RECORD_AUDIO 权限")
-                if (records == null) {
-                    records = Records()
-                }
-                if (!isStart) {
-                    isStart = true
-                    records?.startRecording()
-                    records?.setCallBack(AudioPlayer())
-                } else {
-                    isStart = false
-                    records?.stopRecording()
-                }
-            }
+
+            val mNativePtr = ffmpeg_init("")
+            ffmpeg_prepare(mNativePtr)
+
         }
     }
 
     external fun stringFromJNI(): String
 
 
-    external fun simpleCl():Int
+    external fun simpleCl(): Int
 
     external fun testStruct()
 
@@ -75,9 +78,10 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    /**
-     * 虚函数
-     * 指针与引用
-     * STL
-     */
+
+    external fun ffmpeg_init(url: String): Long
+
+    external fun ffmpeg_prepare(nativePtr: Long)
+
+    external fun ffmpeg_release()
 }
