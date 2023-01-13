@@ -14,7 +14,7 @@ extern "C" JNIEXPORT jstring JNICALL
 Java_com_mdy_practicecl_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
-    std::string hello = test_ffmpeg();
+    //std::string hello = test_ffmpeg();
     //std::string hello = "avcodec_configuration()";
 
     //将char转化为string，注意不可以 std::string config = learn_ffmpeg_base（）没这种构造函数

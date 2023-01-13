@@ -3,10 +3,16 @@ package com.mdy.practicecl
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import androidx.core.app.ActivityCompat
 import com.mdy.practicecl.audio.AudioPlayer
 import com.mdy.practicecl.audio.Records
+import com.mdy.practicecl.codec.H264Decoder
+import com.mdy.practicecl.codec.MediaUtils
 import com.mdy.practicecl.databinding.ActivityMainBinding
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,6 +39,19 @@ class MainActivity : AppCompatActivity() {
             123)
 
 
+        val holder = binding.surfaceView.holder
+        holder.addCallback(object :SurfaceHolder.Callback{
+            override fun surfaceCreated(holder: SurfaceHolder) {
+            }
+
+            override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+            }
+
+            override fun surfaceDestroyed(holder: SurfaceHolder) {
+            }
+        })
+
+
         binding.btn.setOnClickListener {
 
 //            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -56,9 +75,10 @@ class MainActivity : AppCompatActivity() {
 //                }
 //            }
 
+            val filePath = cacheDir.absolutePath+"/temp/1.h264"
+            val h264Decoder = H264Decoder(holder.surface,filePath)
+            h264Decoder.startH264Decoder()
 
-            val mNativePtr = ffmpeg_init("")
-            ffmpeg_prepare(mNativePtr)
 
         }
     }

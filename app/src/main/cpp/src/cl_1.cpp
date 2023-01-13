@@ -26,3 +26,28 @@ int cl_1::getAge() {
 
     return m_age;
 }
+
+
+void cl_1::setPoint() {
+
+    int a = 10;
+    int b = 10;
+
+
+    // 常量指针，指针的指向可以修改，指针指向的值不可以修改
+    const int *point1 = &a;
+    //point1 = &b;   可以修改
+    //*point1 = 100; 错误，不可以修改
+
+
+    // 指针常量，指针的指向不可以修改，指针指向的值可以修改
+    int * const point2 = &a;
+    //point2 = &b; 错误，指针的指向不可以修改
+    //*point2 = 100; 指针指向的值可以修改
+
+    //指针的指向和指针指向的值都不可以修改
+    const int * const point3 = &a;
+
+
+
+}

@@ -20,7 +20,13 @@ string learn_ffmpeg_base() {
 
     const char *config = avcodec_configuration();
 
-    LOGI("learn_ffmpeg_base: %s", config);
+
+    char arr[12] = "maodayu";
+    char *arr1 = "maodayu";
+
+    LOGI("arr: %s", arr);
+    LOGI("arr1: %s", arr1);
+
     return config;
 }
 

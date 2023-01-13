@@ -30,6 +30,9 @@ public:
 
     int getAge();
 
+
+    void setPoint();
+
 };
 
 
