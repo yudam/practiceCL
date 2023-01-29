@@ -166,9 +166,9 @@ class H264Decoder(val surface: Surface, val filePath: String) {
 
     private fun findStartCode3(bytes: ByteArray, offset: Int): Boolean {
 
-        if (bytes[offset + 1].toInt() == 0x00
-            && bytes[offset + 2].toInt() == 0x00
-            && bytes[offset + 3].toInt() == 0x01
+        if (bytes[offset].toInt() == 0x00
+            && bytes[offset + 1].toInt() == 0x00
+            && bytes[offset + 2].toInt() == 0x01
         ) {
             return true
         }
