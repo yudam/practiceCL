@@ -10,6 +10,7 @@ import java.nio.FloatBuffer
 
 /**
  * 转场动画的实现
+ * 转行动画的原理在于，通过FBO首先渲染两个不同的画面，根据两个纹理重新渲染到主屏幕上
  */
 class GLTranslation() {
 

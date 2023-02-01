@@ -7,6 +7,8 @@ package com.mdy.practicecl.audio
  */
 interface AudioFrameCallback {
 
+    fun startFirstFrame(){}
+
     fun frameBuffer(packet: MediaPacket)
 
     fun frameEnd()

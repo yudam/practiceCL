@@ -23,12 +23,15 @@
         android:theme="@style/Theme.PracticeCL"
         tools:targetApi="31">
         <activity
-            android:name=".opengl.OpenGLActivity"
-            android:exported="true">
-
-
-
+            android:name=".AacActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
         </activity>
+        <activity
+            android:name=".opengl.OpenGLActivity"
+            android:exported="true"></activity>
         <activity
             android:name=".MainActivity"
             android:exported="true">

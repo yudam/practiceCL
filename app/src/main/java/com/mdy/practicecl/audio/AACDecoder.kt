@@ -37,11 +37,12 @@ class AACDecoder(audioPath: String) {
     init {
         mediaExtractor = getMediaExtractor(audioPath)
         val mMediaFormat = MediaFormat.createAudioFormat(AAC_MIME_TYPE, sampleRate, channelCount)
-        //mMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, 2)
-        //mMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 262144)
-        //解码的是AAC音频且带有 ADTS header，则必须将KEY_IS_ADTS重置为1，否则后面解码会一直失败
+        //加入下面两项配置不影响音频的输出，暂时不知道为啥，先不研究
+        mMediaFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, 2)
+        mMediaFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, 262144)
+        //解码的是AAC音频且带有 ADTS header，则必须将KEY_IS_ADTS重置为1，否则后面获取解码后的ByteBuffer会一直为-1
         mMediaFormat.setInteger(MediaFormat.KEY_IS_ADTS, 1)
-        //解码的是AAC音频需要设置cds-0，不然可能解析失败
+        //解码的是AAC音频需要设置cds-0，不然可能解析失败（不确定会直接失败，失败会直接抛出异常）
         val headerBuffer = ByteBuffer.allocate(headerArray.size)
         headerBuffer.put(headerArray)
         headerBuffer.flip()
@@ -53,10 +54,11 @@ class AACDecoder(audioPath: String) {
 //        } else {
 //            aacDecoder.configure(mMediaFormat, null, null, 0)
 //        }
-        aacDecoder.configure(mMediaFormat, null, null, 0)
+        aacDecoder.configure(audioFormat, null, null, 0)
         aacDecoder.start()
     }
 
+//
 
     private fun getMediaExtractor(oriPath: String): MediaExtractor {
         val mMediaExtractor = MediaExtractor()
