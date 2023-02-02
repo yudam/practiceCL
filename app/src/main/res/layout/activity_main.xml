@@ -42,6 +42,25 @@
             android:layout_gravity="center_horizontal"/>
 
 
+        <Button
+            android:id="@+id/btn_gl_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GL渲染Bitmap"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+
+
+
+        <Button
+            android:id="@+id/btn_gl_translation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="GL过渡动画"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.GLUtils
+import android.opengl.Matrix
 import com.mdy.practicecl.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -55,7 +56,7 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
     private fun loadVertextAttr() {
         glPosition = GLES20.glGetAttribLocation(mProgramId, "aPosition")
         glTexturePosition = GLES20.glGetAttribLocation(mProgramId, "aTextCoord")
-        glTextureUnit = GLES20.glGetUniformLocation(mProgramId, "uTexture")
+        glTextureUnit = GLES20.glGetUniformLocation(mProgramId, "uTexture1")
     }
 
     private fun draw() {
@@ -68,6 +69,13 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
             false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_vertext_coord))
         GLES20.glVertexAttribPointer(glTexturePosition, 2, GLES20.GL_FLOAT,
             false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_fragment_coord))
+
+        val mvpMatrix = GLES20.glGetUniformLocation(mProgramId,"aMvpMatrix")
+
+        val matrix = FloatArray(16).apply {
+            Matrix.setIdentityM(this, 0)
+        }
+        GLES20.glUniformMatrix4fv(mvpMatrix, 1, false, matrix, 0)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId)

@@ -8,23 +8,18 @@
 #include "../include/ffmpeg_play.h"
 #include <string>
 
+
+/**
+ * ffmpeg播放本地，网络视频流
+ *
+ */
+
 ffmpeg_play::ffmpeg_play() {
 
     LOGI("ffmpeg_play 对象初始化了");
 }
 
 ffmpeg_play::~ffmpeg_play() {
-
-}
-
-void ffmpeg_play::touch_event() {
-
-    LOGI("touch_event 被触发了");
-
-
-    const char *a = "m";
-
-    char b = 'm';
 
 }
 

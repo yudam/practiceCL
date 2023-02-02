@@ -51,11 +51,20 @@ class MainActivity : AppCompatActivity() {
 //            h264Decoder.startH264Decoder()
 
         }
+
+        binding.btnGlImage.setOnClickListener {
+            start(OpenGLActivity::class.java,0)
+        }
+
+        binding.btnGlTranslation.setOnClickListener {
+            start(OpenGLActivity::class.java,1)
+        }
     }
 
 
-    private fun start(activity: Class<*>) {
+    private fun start(activity: Class<*>,config:Int = -1) {
         val intent = Intent(this, activity)
+        intent.putExtra("glConfig",config)
         startActivity(intent)
     }
 

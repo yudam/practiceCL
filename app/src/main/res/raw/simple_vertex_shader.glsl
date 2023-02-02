@@ -1,7 +1,8 @@
 attribute vec4 aPosition;
 attribute vec2 aTextCoord;
-varying vec2 vTextCoord;
+uniform mat4 aMvpMatrix;
+varying vec2 vTextureCoord;
 void main(){
-    vTextCoord = aTextCoord;
-    gl_Position = aPosition;
+    vTextureCoord = aTextCoord;
+    gl_Position = aMvpMatrix * aPosition;
 }

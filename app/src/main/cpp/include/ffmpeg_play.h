@@ -43,7 +43,6 @@ public:
 
     ffmpeg_play();
     ~ffmpeg_play();
-    void touch_event();
 
 };
 

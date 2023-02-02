@@ -7,8 +7,9 @@
 
 #include <iostream>
 #include <string>
+#include "android/log.h"
 
-extern "C"{
+extern "C" {
 
 #include "libavformat/avformat.h"
 };
@@ -16,7 +17,13 @@ extern "C"{
 class ffmpeg_rtmp {
 
 
+public:
 
+    int write_audio_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream);
+
+    int write_video_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream);
+
+    int push_streaming(AVFormatContext *m_AVFormatContext, AVPacket *m_AVPacket);
 };
 
 

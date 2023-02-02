@@ -35,23 +35,13 @@ set(FFMPEG_libavcodec ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/lib
 set(FFMPEG_libavfilter ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavfilter.a)
 set(FFMPEG_libavformat ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavformat.a)
 set(FFMPEG_libavutil ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libavutil.a)
-
 set(FFMPEG_libcrypto ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libcrypto.a)
 set(FFMPEG_libfdk_aac ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libfdk-aac.a)
-
-
-
 set(FFMPEG_libpostproc ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libpostproc.a)
-
 set(FFMPEG_librtmp ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/librtmp.a)
 set(FFMPEG_libssl ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libssl.a)
-
-
-
 set(FFMPEG_libswresample ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswresample.a)
 set(FFMPEG_libswscale ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libswscale.a)
-
-
 set(FFMPEG_libx264 ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libx264.a)
 set(FFMPEG_libyuv ${CMAKE_SOURCE_DIR}/thirdparty/prebuilt/${ANDROID_ABI}/libyuv.a)
 
@@ -107,7 +97,7 @@ target_link_libraries( # Specifies the target library.
         # 指定目标库(这里的practicecl指的是我们自己创建的源生库)
         practicecl
 
-        # 不加入下面两个，直接便已报错，原因未知
+        # 不加入下面两个，直接编译报错，第三方库找不到，原因未知
         z
         android
 

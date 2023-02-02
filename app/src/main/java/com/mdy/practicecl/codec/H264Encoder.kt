@@ -34,6 +34,7 @@ class H264Encoder(val ouputPath: String) {
     init {
         val mediaFormat = MediaFormat.createVideoFormat(mMimeType, 1080, 1920)
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30)
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE,3000 * 1000)
         mediaFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,
             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2)

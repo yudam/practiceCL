@@ -81,5 +81,4 @@ JNIEXPORT void JNICALL
 Java_com_mdy_practicecl_MainActivity_ffmpeg_1prepare(JNIEnv *env, jobject thiz, jlong native_ptr) {
 
     ffmpeg_play *m_ffmpeg_play = reinterpret_cast<ffmpeg_play *>(native_ptr);
-    m_ffmpeg_play->touch_event();
 }
