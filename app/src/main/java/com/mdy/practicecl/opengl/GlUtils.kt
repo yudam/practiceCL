@@ -5,6 +5,7 @@ import android.opengl.GLES10
 import android.opengl.GLES11Ext
 import android.opengl.GLES20
 import android.opengl.GLUtils
+import android.opengl.Matrix
 import android.util.Log
 import com.mdy.practicecl.App
 import java.io.BufferedReader
@@ -61,7 +62,7 @@ object GlUtils {
      * 创建纹理ID
      */
     fun getTexture(isOES: Boolean = false): Int {
-        return getTexture(null,isOES)
+        return getTexture(null, isOES)
     }
 
     /**
@@ -89,7 +90,7 @@ object GlUtils {
             GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_WRAP_S, GLES10.GL_CLAMP_TO_EDGE)
             GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_WRAP_T, GLES10.GL_CLAMP_TO_EDGE)
             bitmap?.let {
-                GLUtils.texImage2D(GLES11Ext.GL_TEXTURE_EXTERNAL_OES,0,it,0)
+                GLUtils.texImage2D(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0, it, 0)
             }
         } else {
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, intArray[0])
@@ -98,7 +99,7 @@ object GlUtils {
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_WRAP_S, GLES10.GL_CLAMP_TO_EDGE)
             GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_WRAP_T, GLES10.GL_CLAMP_TO_EDGE)
             bitmap?.let {
-                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D,0,it,0)
+                GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, it, 0)
             }
         }
         checkGlError("getTexture")
@@ -133,5 +134,38 @@ object GlUtils {
         } catch (e: Exception) {
         }
         return builder.toString()
+    }
+
+    /**
+     * 获取MVP矩阵，对顶点坐标的范围进行计算，得出合适的范围，然后纹理贴上去才不会拉伸
+     * mvp=projection⋅view⋅model⋅local
+     * 初始坐标位于左下角
+     *
+     *
+     * Model矩阵：通过平移、旋转、缩放来设置模型的位置，可以认为是对应纹理的位置和宽高，主要防止图片变形
+     * 投影矩阵：设置将Model矩阵的那一部分映射到[-1,1]的区间上，这里的left，top，right，bottom
+     * 指的是Model矩阵中设置的相关位置，投影矩阵原点位于左下角。
+     */
+    fun getModelMatrix(width: Int, height: Int): FloatArray {
+
+        Log.i("MDY", "width: $width  height:$height  ")
+
+        val modelMatrix = FloatArray(16).apply {
+            Matrix.setIdentityM(this, 0)
+        }
+        Matrix.translateM(modelMatrix, 0, width.toFloat() / 2, height.toFloat() / 2, 0f)
+        // x和y缩放两倍
+        Matrix.scaleM(modelMatrix, 0, width.toFloat()/2, height.toFloat()/2, 1f)
+
+//        //创建投影矩阵，
+//        val projectMatrix = FloatArray(16)
+//        Matrix.orthoM(projectMatrix, 0, 0f, width.toFloat(), 0f, height.toFloat(), -1f, 1f)
+//
+//        // 计算MVP矩阵，projectMatrix和modelMatrix的顺序要注意
+//        val mvpMatrix = FloatArray(16)
+//        Matrix.multiplyMM(mvpMatrix, 0, projectMatrix, 0, modelMatrix, 0)
+//
+//        Log.i("MDY", "mvpMatrix: " + mvpMatrix.toList().toString())
+        return modelMatrix
     }
 }

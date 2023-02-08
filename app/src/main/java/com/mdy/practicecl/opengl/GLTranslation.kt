@@ -4,18 +4,11 @@ import android.content.Context
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLES30
-import android.opengl.GLSurfaceView
 import android.opengl.Matrix
 import android.os.Handler
 import android.os.HandlerThread
-import android.os.Looper
-import android.util.Log
 import com.mdy.practicecl.R
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.nio.FloatBuffer
-import javax.microedition.khronos.egl.EGLConfig
-import javax.microedition.khronos.opengles.GL10
 
 /**
  * 转场动画的实现
@@ -27,73 +20,24 @@ import javax.microedition.khronos.opengles.GL10
  */
 class GLTranslation(val context: Context) :HandlerThread("translation-gl-thread") {
 
-    private val vertexCoord = floatArrayOf(
-        -1f, 1f, 0f,
-        -1f, -1f, 0f,
-        1f, -1f, 0f,
-        1f, 1f, 0f
-    )
-
-    private val mainCoord = floatArrayOf(
-        0f, 0f, 0f,
-        0f, 1f, 0f,
-        1f, 1f, 0f,
-        1f, 0f, 0f
-    )
-
-    private val fboCoord = floatArrayOf(
-        0f, 1f, 0f,
-        0f, 0f, 0f,
-        1f, 0f, 0f,
-        1f, 1f, 0f
-    )
-
-    private val vertexBuffer = ByteBuffer.allocateDirect(vertexCoord.size * Float.SIZE_BYTES)
-        .order(ByteOrder.nativeOrder())
-        .asFloatBuffer().apply {
-            put(vertexCoord)
-            position(0)
-        }
-
-    private val fboBuffer = ByteBuffer.allocateDirect(fboCoord.size * Float.SIZE_BYTES)
-        .order(ByteOrder.nativeOrder())
-        .asFloatBuffer().apply {
-            put(fboCoord)
-            position(0)
-        }
-
-    private val fragmentBuffer = ByteBuffer.allocateDirect(mainCoord.size * Float.SIZE_BYTES)
-        .order(ByteOrder.nativeOrder())
-        .asFloatBuffer().apply {
-            put(mainCoord)
-            position(0)
-        }
-
+    private val vertexBuffer = DrawBuffer.getByteBuffer(DrawBuffer.DrawType.CommonVertex)
+    private val fboBuffer = DrawBuffer.getByteBuffer(DrawBuffer.DrawType.OriginalTexture)
+    private val fragmentBuffer = DrawBuffer.getByteBuffer(DrawBuffer.DrawType.CommonTexture)
     private var tProgram: Int = -1
     private var mainProgram: Int = -1
     private var subProgram: Int = -1
-
     private var mainFrameBuffer: GLFrameBuffer? = null
     private var subFrameBuffer: GLFrameBuffer? = null
-
     private var mTextureId1 = -1
     private var mTextureId2 = -1
-
     // 片段着色器中需要的转场动画参数
     private var mProgress = 0f
     private var mDuration = 5000L
     private var mDirection = FloatArray(2)
-
-
     private var animHandler:Handler? = null
 
-    private val defaultMatrix = FloatArray(16).apply {
-        Matrix.setIdentityM(this, 0)
-    }
 
-    private val uMatrix = FloatArray(16).apply {
-        Matrix.setIdentityM(this, 0)
-    }
+    private var uMatrix = FloatArray(16)
 
     private var callback:(()->Unit)? =  null
 
@@ -142,6 +86,18 @@ class GLTranslation(val context: Context) :HandlerThread("translation-gl-thread"
     fun initBuffer(width: Int,height: Int){
         mainFrameBuffer =  initFBO(width, height)
         subFrameBuffer = initFBO(width, height)
+        val cx = width/2
+        val cy = height/2
+        val modelMatrix = FloatArray(16).apply {
+            Matrix.setIdentityM(this, 0)
+        }
+        Matrix.translateM(modelMatrix, 0, cx.toFloat(), cy.toFloat(), 0f)
+        Matrix.scaleM(modelMatrix, 0, width.toFloat()/2, width.toFloat()/2, 1f)
+
+        val projectMatrix = FloatArray(16).apply {
+            Matrix.orthoM(this,0,0f,width.toFloat(),0f,height.toFloat(),-1f,1f)
+        }
+        Matrix.multiplyMM(uMatrix,0,projectMatrix,0,modelMatrix,0)
     }
 
 
@@ -219,12 +175,12 @@ class GLTranslation(val context: Context) :HandlerThread("translation-gl-thread"
 
         // 渲染第一个FBO
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mainFrameBuffer!!.frameBufferId)
-        createGLProgram(mainProgram, mTextureId1, -1, fboBuffer, defaultMatrix)
+        createGLProgram(mainProgram, mTextureId1, -1, fboBuffer, uMatrix)
         render()
 
         // 渲染第二个FBO
         GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, subFrameBuffer!!.frameBufferId)
-        createGLProgram(subProgram, mTextureId2, -1, fboBuffer, defaultMatrix)
+        createGLProgram(subProgram, mTextureId2, -1, fboBuffer, uMatrix)
         render()
 
         // 渲染转场动画

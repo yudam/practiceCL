@@ -16,8 +16,18 @@ extern "C" {
 
 class ffmpeg_rtmp {
 
+private:
+
+    AVFormatContext *infmt_ctx, *outfmt_ctx;
+
+    char *in_filename, *out_filename;
+
 
 public:
+
+    ffmpeg_rtmp();
+
+    ~ffmpeg_rtmp();
 
     int write_audio_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream);
 

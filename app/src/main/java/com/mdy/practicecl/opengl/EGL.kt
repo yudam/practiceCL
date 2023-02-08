@@ -58,6 +58,8 @@ class EGL {
         val mEGLContextAttr = intArrayOf(
             EGL14.EGL_CONTEXT_CLIENT_VERSION, 2, EGL14.EGL_NONE
         )
+
+        // 可以传入一个已经创建的EglContext，会返回一个共享的上下文
         mEGLContext = EGL14.eglCreateContext(mEGLDisplay, mEGLConfig, mEGLContext, mEGLContextAttr, 0)
 
     }
@@ -79,10 +81,11 @@ class EGL {
         val mEGLSurface = EGL14.eglCreateWindowSurface(mEGLDisplay, mEGLConfig, surface, surfaceAttr, 0)
         return mEGLSurface
     }
-
     /**
      * 6. 绑定上下文环境
      * 绑定上下文环境后，就可以执行具体的绘制操作，调用OpenGL相关的方法绘制图形
+     *
+     * 注意：必须在切换到当前上下文后，才可以执行OpenGL的函数
      */
     private fun makeCurrent(eglSurface: EGLSurface) {
         EGL14.eglMakeCurrent(mEGLDisplay, eglSurface, eglSurface, mEGLContext)

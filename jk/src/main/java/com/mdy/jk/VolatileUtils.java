@@ -24,23 +24,29 @@ public class VolatileUtils {
 
     public static void main(String[] args) {
 
-        for (int i = 0; i < 10; i++) {
+        float time = (1024f / 44100f) ;
+        float time2 = time * (1000 * 1000 * 1000);
 
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    for (int j = 0; j < 10000; j++) {
-                        increase();
-                    }
-                }
-            }).start();
-        }
+        System.out.println(time +"      " + time2);
 
 
-        while (Thread.activeCount() > 1){
-            Thread.yield();
-        }
-
-        System.out.println(" vlEvent : " +vlEvent);
+//        for (int i = 0; i < 10; i++) {
+//
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    for (int j = 0; j < 10000; j++) {
+//                        increase();
+//                    }
+//                }
+//            }).start();
+//        }
+//
+//
+//        while (Thread.activeCount() > 1){
+//            Thread.yield();
+//        }
+//
+//        System.out.println(" vlEvent : " +vlEvent);
     }
 }

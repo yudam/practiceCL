@@ -6,6 +6,12 @@
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"ffmpeg_rtmp",__VA_ARGS__)
 
+ffmpeg_rtmp::ffmpeg_rtmp() {
+
+    av_register_all();
+    avformat_network_init();
+}
+
 
 int ffmpeg_rtmp::write_audio_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream) {
 

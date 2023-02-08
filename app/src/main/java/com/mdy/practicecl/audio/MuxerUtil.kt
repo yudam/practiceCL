@@ -10,6 +10,11 @@ import java.nio.ByteBuffer
  * 音频混合器
  *
  * MediaMuxer当前只支持AAC压缩格式的音频
+ *
+ * MediaMuxer生成AAC音频文件时，不需要添加AAC头信息，直接写入即可。
+ * MediaCodec.BufferInfo中包含了每一帧数据的偏移、大小和时间戳（微秒 = ms * 1000）等信息。
+ *
+ * 当编码器没输出一次数据，即可认为输出一帧AAC数据，一帧AAC数据包括1024个采样点
  */
 class MuxerUtil(val path: String) {
 

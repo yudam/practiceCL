@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.SurfaceHolder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.mdy.practicecl.codec.MediaUtils
 import com.mdy.practicecl.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -40,16 +41,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        binding.btnFormat.setOnClickListener {
+            MediaUtils.getSupportCodec()
+        }
+
 
         binding.btnAac.setOnClickListener {
-
             start(AacActivity::class.java)
-
-            // H264解码播放
-//            val filePath = cacheDir.absolutePath+"/temp/1.h264"
-//            val h264Decoder = H264Decoder(holder.surface,filePath)
-//            h264Decoder.startH264Decoder()
-
         }
 
         binding.btnGlImage.setOnClickListener {

@@ -1,11 +1,13 @@
 package com.mdy.practicecl.opengl
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.opengl.GLES20
 import android.opengl.GLSurfaceView
 import android.opengl.GLUtils
 import android.opengl.Matrix
+import android.util.Log
 import com.mdy.practicecl.R
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
@@ -23,18 +25,35 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
     private var glTexturePosition = -1
     private var glTextureUnit = -1
 
+    private var bitmap: Bitmap? = null
+    private var matrix: FloatArray = FloatArray(16)
+
     val renderer = object : Renderer {
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
+            bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_tt_1)
             val vertext = GlUtils.readRawResourse(R.raw.simple_vertex_shader)
             val fragment = GlUtils.readRawResourse(R.raw.simple_fragment_shader)
-            mTextureId = GlUtils.getTexture()
+            mTextureId = GlUtils.getTexture(bitmap)
             mProgramId = GlUtils.getProgram(vertext, fragment)
             loadVertextAttr()
-            loadImage()
         }
 
         override fun onSurfaceChanged(gl: GL10?, width: Int, height: Int) {
             GLES20.glViewport(0, 0, width, height)
+            val cx = width/2
+            val cy = height/2
+            val modelMatrix = FloatArray(16).apply {
+                Matrix.setIdentityM(this, 0)
+            }
+            Matrix.translateM(modelMatrix, 0, cx.toFloat(), cy.toFloat(), 0f)
+            Matrix.scaleM(modelMatrix, 0, width.toFloat()/2, width.toFloat()/2, 1f)
+
+            val projectMatrix = FloatArray(16).apply {
+                Matrix.orthoM(this,0,0f,width.toFloat(),0f,height.toFloat(),-1f,1f)
+            }
+
+            Log.i("MDY", "projectMatrix: "+projectMatrix.toList().toString())
+            Matrix.multiplyMM(matrix, 0, projectMatrix, 0, modelMatrix, 0)
         }
 
         override fun onDrawFrame(gl: GL10?) {
@@ -46,11 +65,6 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
         setEGLContextClientVersion(2)
         setRenderer(renderer)
         renderMode = RENDERMODE_WHEN_DIRTY
-    }
-
-    private fun loadImage() {
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_tt_1)
-        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0)
     }
 
     private fun loadVertextAttr() {
@@ -70,11 +84,10 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
         GLES20.glVertexAttribPointer(glTexturePosition, 2, GLES20.GL_FLOAT,
             false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_fragment_coord))
 
-        val mvpMatrix = GLES20.glGetUniformLocation(mProgramId,"aMvpMatrix")
+        val mvpMatrix = GLES20.glGetUniformLocation(mProgramId, "aMvpMatrix")
 
-        val matrix = FloatArray(16).apply {
-            Matrix.setIdentityM(this, 0)
-        }
+
+        Log.i("MDY", "draw: " + matrix!!.toList().toString())
         GLES20.glUniformMatrix4fv(mvpMatrix, 1, false, matrix, 0)
 
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0)
