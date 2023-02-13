@@ -57,6 +57,10 @@ class MainActivity : AppCompatActivity() {
         binding.btnGlTranslation.setOnClickListener {
             start(OpenGLActivity::class.java,1)
         }
+
+        binding.btnGlEgl.setOnClickListener {
+            start(EGLActivity::class.java,1)
+        }
     }
 
 

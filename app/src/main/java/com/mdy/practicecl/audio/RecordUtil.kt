@@ -6,7 +6,10 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import com.mdy.practicecl.App
+import java.io.BufferedOutputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingQueue
 import kotlin.concurrent.thread
@@ -16,7 +19,7 @@ import kotlin.concurrent.thread
  * 注意权限问题
  */
 @SuppressLint("MissingPermission")
-class RecordUtil(val callback: AudioFrameCallback) : Thread("Audio-Record-1") {
+class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) : Thread("Audio-Record-1") {
 
     private val TAG = "RecordUtil"
     private var isRecord = false
@@ -24,6 +27,7 @@ class RecordUtil(val callback: AudioFrameCallback) : Thread("Audio-Record-1") {
     private val sampleRate = 44100
     private var bufferSize: Int = 0
     private var isFirstFrame = true
+
 
 
     override fun run() {
@@ -58,6 +62,7 @@ class RecordUtil(val callback: AudioFrameCallback) : Thread("Audio-Record-1") {
                 //重置ByteBuffer的position和limit
                 buf.position(len)
                 buf.flip()
+
                 val mediaData = MediaPacket().apply {
                     data = buf
                 }

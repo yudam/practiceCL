@@ -1,10 +1,13 @@
 package com.mdy.practicecl.audio
 
+import android.media.AudioFormat
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.util.Log
+import java.io.BufferedOutputStream
 import java.io.FileOutputStream
+import java.io.OutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
@@ -35,7 +38,7 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
     private val mBufferPool = LinkedBlockingQueue<ByteBuffer>()
 
     private var muxerUtil: MuxerUtil? = null
-    private var outFile = FileOutputStream(audioPath)
+    private var outFile = BufferedOutputStream(FileOutputStream(audioPath))
 
 
     init {
@@ -43,6 +46,7 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
         audioFormat.setInteger(MediaFormat.KEY_BIT_RATE, bitRate)
         audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC)
         audioFormat.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE, maxInputSize)
+        audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK,AudioFormat.CHANNEL_IN_STEREO)
         aacEncoder = MediaCodec.createEncoderByType(AAC_MIME_TYPE)
         aacEncoder.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         aacEncoder.start()
@@ -56,8 +60,9 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
             if (inputerBufferIndex >= 0) {
                 val dataBuffer = mBufferPool.poll(1000, TimeUnit.MILLISECONDS)
                 val inputBuffer = aacEncoder.getInputBuffer(inputerBufferIndex)
-                if (dataBuffer != null) {
-                    inputBuffer?.put(dataBuffer)
+                dataBuffer?.let {
+                    inputBuffer?.clear()
+                    inputBuffer?.put(it)
                     aacEncoder.queueInputBuffer(inputerBufferIndex, 0, dataBuffer.capacity(), 0, 0)
                 }
             }
@@ -70,27 +75,28 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
 
             if (outputBufferIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                 //MediaFormat发生改变，通常只会在开始调用一次，可以设置混合器的轨道
-                Log.i(TAG, "编码器Mediaformat发生改变  ")
+//                Log.i(TAG, "编码器Mediaformat发生改变  ")
 //                val newFormat = aacEncoder.outputFormat
 //                muxerUtil = MuxerUtil(audioPath)
 //                muxerUtil?.addTrack(newFormat)
 
             } else if (outputBufferIndex >= 0) {
-                val aacData = ByteArray(bufferInfo.size + 7)
                 val outputBuffer = aacEncoder.getOutputBuffer(outputBufferIndex)
                 if (bufferInfo.flags == MediaCodec.BUFFER_FLAG_END_OF_STREAM) {
                     Log.i(TAG, "编码结束: ")
                     isEncoder = false
                 } else {
-                    //获取编码后的AAC数据，并添加头部参数
-                    outputBuffer?.get(aacData, 7, bufferInfo.size)
-                    // AacUtils.addADTStoPacket(aacData)
-                    //将编码后的音频送入混合器
-//                    val outBuffer = ByteBuffer.allocateDirect(bufferInfo.size + 7)
-//                    outBuffer.put(aacData)
-//                    Log.i(TAG, "AAC音频数据   size: " + bufferInfo.size + "    pts:" + bufferInfo.presentationTimeUs)
-//                    outBuffer.flip()
-                    outFile.write(aacData)
+                    outputBuffer?.let {
+                        val aacData = ByteArray(bufferInfo.size + 7)
+                        //获取编码后的AAC数据，并添加头部参数
+                        AacUtils.addADTStoPacket(aacData)
+                        it.rewind()
+                        it.get(aacData,7,bufferInfo.size)
+                        it.rewind()
+                        //将编码后的音频写入文件
+                        writeAudio2File(aacData,outFile)
+                    }
+                    Log.i(TAG, "AAC音频数据   size: " + bufferInfo.size + "    pts:" + bufferInfo.presentationTimeUs)
                     //muxerUtil?.putStream(outBuffer, bufferInfo)
                 }
                 aacEncoder.releaseOutputBuffer(outputBufferIndex, false)
@@ -100,7 +106,6 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
         aacEncoder.release()
         Log.i(TAG, "编码结束: end ")
        // muxerUtil?.release()
-        outFile.close()
     }
 
 
@@ -124,5 +129,13 @@ class AACEncoder(val audioPath: String) : AudioFrameCallback {
 
     override fun frameEnd() {
         isEncoder = false
+    }
+
+
+
+    fun writeAudio2File(byteArray: ByteArray, outPutStream: OutputStream){
+        outPutStream.write(byteArray)
+        outPutStream.flush()
+        Log.d("audio_remain","write success")
     }
 }

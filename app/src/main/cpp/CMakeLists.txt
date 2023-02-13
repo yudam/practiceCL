@@ -71,7 +71,8 @@ add_library( # Sets the name of the library.
 
         # 要编译的c/c++文件
         ${FILE_C}
-        native-lib.cpp)
+        native-lib.cpp
+        ffmpeg_op.cpp)
 
 # 添加ffmpeg库
 message("FFMPEG_libcrypto : ${FFMPEG_libcrypto}")

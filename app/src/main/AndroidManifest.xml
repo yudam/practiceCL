@@ -11,6 +11,10 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
+
+    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
+
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -23,6 +27,20 @@
         android:theme="@style/Theme.PracticeCL"
         tools:targetApi="31">
         <activity
+            android:name=".EGLActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".FFmpegctivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".AacActivity"
             android:exported="false">
             <meta-data
@@ -31,7 +49,7 @@
         </activity>
         <activity
             android:name=".OpenGLActivity"
-            android:exported="true"></activity>
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

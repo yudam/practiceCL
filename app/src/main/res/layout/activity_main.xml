@@ -74,6 +74,14 @@
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"/>
 
+        <Button
+            android:id="@+id/btn_gl_egl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="EGL配置简单渲染"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
