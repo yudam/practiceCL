@@ -82,6 +82,35 @@
             android:layout_marginTop="20dp"
             android:layout_gravity="center_horizontal"/>
 
+
+        <Button
+            android:id="@+id/btn_gl_camera"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Camera配合TextureView渲染"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+
+        <Button
+            android:id="@+id/btn_ffmpeg"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ffmpeg"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+
+
+        <Button
+            android:id="@+id/btn_H264"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="H264"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"/>
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

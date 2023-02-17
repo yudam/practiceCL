@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import com.mdy.practicecl.databinding.ActivityEglactivityBinding
+import com.mdy.practicecl.opengl.Camera1
 import com.mdy.practicecl.opengl.EglCore
 import com.mdy.practicecl.opengl.GLDrawableUtils
 import com.mdy.practicecl.opengl.GlUtils
@@ -33,8 +34,6 @@ class EGLActivity : AppCompatActivity() {
         render.start()
 
         binding.btnStart.setOnClickListener {
-
-
         }
 
         //主动设置SurfaceTexture，不会回调SurfaceTextureListener的onSurfaceTextureAvailable方法
@@ -62,6 +61,7 @@ class EGLActivity : AppCompatActivity() {
 
         override fun run() {
             while (true) {
+                //等待SurfaceView创建在继续执行后续内容
                 synchronized(mLock) {
                     if (mSurfaceTexture == null) {
                         mLock.wait()
@@ -78,8 +78,10 @@ class EGLActivity : AppCompatActivity() {
                     mEglCore?.releaseSurface(it)
                     mEglCore?.release()
                 }
-            }
 
+                sleep(23)
+            }
+           // mSurfaceTexture?.release()
         }
 
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {

@@ -19,8 +19,9 @@ class Camera1(val context: Context) {
     fun open(): Camera1 {
         camera = Camera.open()
         val params = camera.parameters
-        val mSize = params.preferredPreviewSizeForVideo
-        params.setPreviewSize(1920,1080)
+        val supportedPreviewSizes = params.supportedPreviewSizes
+
+        params.setPreviewSize(supportedPreviewSizes[0].width, supportedPreviewSizes[0].height)
         camera.parameters = params
         return this
     }
@@ -34,20 +35,20 @@ class Camera1(val context: Context) {
     fun startPreview(): Camera1 {
         camera.startPreview()
 
-       val mSize =  camera.parameters.previewSize
+        val mSize = camera.parameters.previewSize
         return this
     }
 
 
-    fun getSize():IntArray{
+    fun getSize(): IntArray {
         val size = IntArray(2)
-        val mSize =  camera.parameters.previewSize
+        val mSize = camera.parameters.previewSize
         size[0] = mSize.width
         size[1] = mSize.height
         return size
     }
 
-    private fun setDisplayOrientation(camera:Camera,info:Camera.CameraInfo){
+    private fun setDisplayOrientation(camera: Camera, info: Camera.CameraInfo) {
         val activity = context as Activity
         val rotation: Int = activity.windowManager.defaultDisplay.rotation
         var degrees = 0
@@ -68,14 +69,14 @@ class Camera1(val context: Context) {
         camera.setDisplayOrientation(result)
     }
 
-    private fun getCameraInfo():List<Camera.CameraInfo>{
+    private fun getCameraInfo(): List<Camera.CameraInfo> {
         val cameraList = mutableListOf<Camera.CameraInfo>()
         val cameraCount = Camera.getNumberOfCameras()
         Log.i("MDY", "cameraCount:" + cameraCount)
         for (index in 0 until cameraCount) {
             val cameraInfo = Camera.CameraInfo()
-            Camera.getCameraInfo(index,cameraInfo)
-            Log.i("MDY", "orientation:"+cameraInfo.orientation+"   facing:"+cameraInfo.facing)
+            Camera.getCameraInfo(index, cameraInfo)
+            Log.i("MDY", "orientation:" + cameraInfo.orientation + "   facing:" + cameraInfo.facing)
             cameraList.add(cameraInfo)
         }
         return cameraList

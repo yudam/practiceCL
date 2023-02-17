@@ -10,10 +10,9 @@
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-
-
-    <uses-feature android:glEsVersion="0x00020000" android:required="true" />
-
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <application
         android:name=".App"
@@ -26,6 +25,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PracticeCL"
         tools:targetApi="31">
+        <activity
+            android:name=".codec.H264Activity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".CamearLiveActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".EGLActivity"
             android:exported="false">

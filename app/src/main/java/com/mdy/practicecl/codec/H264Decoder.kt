@@ -57,20 +57,18 @@ class H264Decoder(val surface: Surface, val filePath: String) {
      * 解码
      */
     private fun onFrame() {
-        thread {
-            startTime = System.currentTimeMillis()
-            while (!isDecoderFinish){
-                val inputIndex = mMediaCodec.dequeueInputBuffer(timeoutUs)
-                if (inputIndex >= 0) {
-                    val inputBuffer = mMediaCodec.getInputBuffer(inputIndex)
-                    val byteLength = readH264Data(inputBuffer!!)
-                    mMediaCodec.queueInputBuffer(inputIndex, 0, byteLength, 0, 0)
-                }
+        startTime = System.currentTimeMillis()
+        while (!isDecoderFinish){
+            val inputIndex = mMediaCodec.dequeueInputBuffer(timeoutUs)
+            if (inputIndex >= 0) {
+                val inputBuffer = mMediaCodec.getInputBuffer(inputIndex)
+                val byteLength = readH264Data(inputBuffer!!)
+                mMediaCodec.queueInputBuffer(inputIndex, 0, byteLength, 0, 0)
+            }
 
-                val outPutIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, timeoutUs)
-                if (outPutIndex >= 0) {
-                    mMediaCodec.releaseOutputBuffer(outPutIndex, true)
-                }
+            val outPutIndex = mMediaCodec.dequeueOutputBuffer(mBufferInfo, timeoutUs)
+            if (outPutIndex >= 0) {
+                mMediaCodec.releaseOutputBuffer(outPutIndex, true)
             }
         }
     }

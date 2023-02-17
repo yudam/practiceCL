@@ -31,6 +31,8 @@ void ffmpeg_play::init(char *url) {
 
 void ffmpeg_play::prepare() {
 
+    av_register_all();
+
     /**
      * 1. 创建封装格式上下文
      */

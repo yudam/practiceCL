@@ -12,28 +12,26 @@
 extern "C" {
 
 #include "libavformat/avformat.h"
+#include "include/libavutil/mathematics.h"
+#include "include/libavutil/time.h"
 };
 
 class ffmpeg_rtmp {
 
 private:
 
-    AVFormatContext *infmt_ctx, *outfmt_ctx;
+    AVFormatContext *ifmt_ctx;
+    AVFormatContext *ofmt_ctx;
 
-    char *in_filename, *out_filename;
+    char *in_filename = "/storage/9016-4EF8/VideoRecord/20221110-194720.mp4";
+    char *out_filename = "rtmp://box-stream-push-test.yololiv.com/yololiv/1004690261428666369?txSecret=15afbe687082490c46364c86ad3f9e5e&txTime=76b8c856";
 
 
 public:
 
-    ffmpeg_rtmp();
+    void init();
 
-    ~ffmpeg_rtmp();
-
-    int write_audio_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream);
-
-    int write_video_frame(AVFormatContext *m_AVFormatContext, AVStream *m_AVStream);
-
-    int push_streaming(AVFormatContext *m_AVFormatContext, AVPacket *m_AVPacket);
+    void release();
 };
 
 

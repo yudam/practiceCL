@@ -2,12 +2,16 @@ package com.mdy.practicecl
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.SurfaceHolder
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import com.mdy.practicecl.codec.H264Activity
 import com.mdy.practicecl.codec.MediaUtils
 import com.mdy.practicecl.databinding.ActivityMainBinding
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,22 +55,44 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.btnGlImage.setOnClickListener {
-            start(OpenGLActivity::class.java,0)
+            start(OpenGLActivity::class.java, 0)
         }
 
         binding.btnGlTranslation.setOnClickListener {
-            start(OpenGLActivity::class.java,1)
+            start(OpenGLActivity::class.java, 1)
         }
 
         binding.btnGlEgl.setOnClickListener {
-            start(EGLActivity::class.java,1)
+            start(EGLActivity::class.java, 1)
         }
+
+        binding.btnGlCamera.setOnClickListener {
+            start(CamearLiveActivity::class.java, 1)
+        }
+
+
+        binding.btnFfmpeg.setOnClickListener {
+            start(FFmpegctivity::class.java)
+        }
+
+
+        binding.btnH264.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+                    124)
+            } else {
+                start(H264Activity::class.java)
+            }
+        }
+
     }
 
 
-    private fun start(activity: Class<*>,config:Int = -1) {
+    private fun start(activity: Class<*>, config: Int = -1) {
         val intent = Intent(this, activity)
-        intent.putExtra("glConfig",config)
+        intent.putExtra("glConfig", config)
         startActivity(intent)
     }
 
