@@ -5,23 +5,27 @@ import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.util.Log
+import com.mdy.practicecl.Utils
+import com.mdy.practicecl.audio.MuxerUtil
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
 
 /**
- * 采集相机的YUV数据，然后H264编码混合生成MP4文件
+ * 采集相机的YUV数据，然后H264编码混合生成MP4文件，在创建MediaFormat时不需要配置sps和pps，在编码接收到
+ * 第一帧也就是INFO_OUTPUT_FORMAT_CHANGED时，可以获取outputFormat来获取sps和pps，sps和pps一般位于
+ * 码流的起始位置，也就是编码器的第一帧。
+ *
+ * sps ：序列参数集，保存了和编码序列相关的参数，如编码的profile、level、图像宽高等
+ * pps ：图像参数集，保存了图像的相关参数
  *
  * 1. 问题： 编码器只支持NV12，相机传递过来的数据是NV21导致dequeueOutputBuffer直接抛出异常，
  *    解决办法就是设置相机的预览数据格式NV21，编码时转化为NV12
  *
- * 2. 问题： 编码器设置的宽高与相机预览数据的宽高不一致导致花屏，
- *    解决办法就是统一预览数据的宽高和编码器的宽高
- *
- * 3. 问题： 编码时queueInputBuffer传入的pts为0，导致视频只有封面
+ * 2. 问题： 编码时queueInputBuffer传入的pts为0，导致视频只有封面
  *    解决办法就是计算pts然后传入
  *
- * 4. 问题： 相机预览的宽高是1920*1080，编码器的宽高是1080*1920，导致的花屏和视频翻转问题
+ * 3. 问题： 相机预览的宽高是1920*1080，编码器的宽高是1080*1920，导致的花屏和视频翻转问题
  *
  *    camera1中预览返回的数据是NV21，且数据显示时是偏转的，所以需要将其顺时针旋转270度或者
  *    逆时针旋转90度，然后在转化为NV12才是正常的数据
@@ -62,11 +66,6 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
         mediaFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,
             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2)
-        // H264编码必须设置sps和pps
-//        val sps = byteArrayOf(0, 0, 0, 1, 103, 66, 0, 41, -115, -115, 64, 80, 30, -48, 15, 8, -124, 83, -128)
-//        mediaFormat.setByteBuffer("csd-0", ByteBuffer.wrap(sps))
-//        val pps = byteArrayOf(0, 0, 0, 1, 104, -54, 67, -56)
-//        mediaFormat.setByteBuffer("csd-1", ByteBuffer.wrap(pps))
         mMediaCodec = MediaCodec.createEncoderByType(mMimeType)
         mMediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
         mMediaCodec.start()
@@ -110,6 +109,18 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
                     mediaMuxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
                     mTrackIndex = mediaMuxer?.addTrack(mMediaCodec.outputFormat) ?: -1
                     mediaMuxer?.start()
+                    // 获取sps和pps
+                    val sps = mMediaCodec.outputFormat.getByteBuffer("csd-0")
+                    val pps = mMediaCodec.outputFormat.getByteBuffer("csd-1")
+                    Log.i(TAG, "sps: "+ Utils.bytesToHex(sps?.array()))
+                    sps?.array()?.forEachIndexed { index, byte ->
+                        Log.i(TAG, "index: "+index+"   byte: "+byte)
+                    }
+                    Log.i(TAG, "pps: "+Utils.bytesToHex(pps?.array()))
+                    pps?.array()?.forEachIndexed { index, byte ->
+                        Log.i(TAG, "index: "+index+"   byte: "+byte)
+                    }
+
                 } else if ((mBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                     // 表示当前缓冲区携带的是编码器的初始化信息，并不是媒体数据
                     Log.i(TAG, "BUFFER_FLAG_CODEC_CONFIG: ")
@@ -193,4 +204,5 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
         }
         return nv12
     }
+
 }
