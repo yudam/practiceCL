@@ -26,6 +26,13 @@
         android:theme="@style/Theme.PracticeCL"
         tools:targetApi="31">
         <activity
+            android:name=".muxer.MuxerActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".codec.H264Activity"
             android:exported="false">
             <meta-data

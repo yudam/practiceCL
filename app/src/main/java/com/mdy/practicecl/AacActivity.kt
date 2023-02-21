@@ -76,9 +76,12 @@ class AacActivity : AppCompatActivity() {
 
 
     private fun getAudioPath(): String {
-        val path = cacheDir.absolutePath + "/audiofile12"
+        val path = cacheDir.absolutePath + "/audiofile"
         val file = File(path)
         if (!file.exists()) {
+            file.createNewFile()
+        } else {
+            file.delete()
             file.createNewFile()
         }
         return path

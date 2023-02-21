@@ -1,24 +1,14 @@
 package com.mdy.practicecl.codec
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.view.Surface
 import android.view.TextureView
-import androidx.core.app.ActivityCompat
-import com.mdy.practicecl.audio.AACEncoder
-import com.mdy.practicecl.audio.MediaPacket
-import com.mdy.practicecl.audio.RecordUtil
-import com.mdy.practicecl.databinding.ActivityAacBinding
+import androidx.appcompat.app.AppCompatActivity
 import com.mdy.practicecl.databinding.ActivityH264Binding
-import com.mdy.practicecl.opengl.TextureSurface
 import java.io.File
-import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
 class H264Activity : AppCompatActivity() {
@@ -28,33 +18,40 @@ class H264Activity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityH264Binding
-
     private var h264Encoder: H264Encoder? = null
     private val cameraRender = CameraRender()
-    private var isEncoder: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityH264Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         h264Encoder = H264Encoder(getVideoPath())
         h264Encoder?.start()
         cameraRender.setH264Encoder(h264Encoder!!)
 
+
+
+
+
         binding.videoTexture1.surfaceTextureListener = cameraRender
-        binding.videoTexture2.surfaceTextureListener = EncoderRender()
+        binding.videoTexture2.surfaceTextureListener = EncoderRender(getVideoPath())
 
         binding.btn264Encoder.setOnClickListener {
-            if (isEncoder) {
-                isEncoder = false
-                h264Encoder?.stopEncoder()
-            } else {
-                isEncoder = true
-                h264Encoder?.startEncoder()
-            }
+
+        }
+
+        binding.btn264Decoder.setOnClickListener {
         }
     }
+
+
+    override fun onPause() {
+        super.onPause()
+        h264Encoder?.stopEncoder()
+    }
+
 
 
     private fun getVideoPath(): String {
@@ -110,9 +107,17 @@ class H264Activity : AppCompatActivity() {
 
     }
 
-    class EncoderRender : TextureView.SurfaceTextureListener {
+    class EncoderRender(val videoPath:String) : TextureView.SurfaceTextureListener {
+
+        private var h264Decoder:H264Decoder? = null
 
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
+            thread {
+                Log.i("H264Decoder", "onSurfaceTextureAvailable: ")
+//                val mSurface = Surface(surface)
+//                h264Decoder =  H264Decoder(mSurface,videoPath)
+//                h264Decoder?.startH264Decoder()
+            }
         }
 
         override fun onSurfaceTextureSizeChanged(surface: SurfaceTexture, width: Int, height: Int) {

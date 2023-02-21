@@ -6,7 +6,9 @@ import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.util.Log
 import com.mdy.practicecl.Utils
-import com.mdy.practicecl.audio.MuxerUtil
+import com.mdy.practicecl.audio.MediaPacket
+import com.mdy.practicecl.muxer.IEncoderDataListener
+import java.nio.ByteBuffer
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 
@@ -49,6 +51,8 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
 
     private val timeoutUs = 10000L
 
+    private var dataListener:IEncoderDataListener? = null
+
     @Volatile
     private var isEncoder = true
 
@@ -85,6 +89,10 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
         mediaQueue.offer(packet)
     }
 
+    fun setListener(listener: IEncoderDataListener?){
+        dataListener = listener
+    }
+
     private fun onFrame() {
         val mBufferInfo = MediaCodec.BufferInfo()
         while (isEncoder) {
@@ -109,6 +117,8 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
                     mediaMuxer = MediaMuxer(outputFile, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
                     mTrackIndex = mediaMuxer?.addTrack(mMediaCodec.outputFormat) ?: -1
                     mediaMuxer?.start()
+
+                    dataListener?.notifyMediaFormat(mMediaCodec.outputFormat,true)
                     // 获取sps和pps
                     val sps = mMediaCodec.outputFormat.getByteBuffer("csd-0")
                     val pps = mMediaCodec.outputFormat.getByteBuffer("csd-1")
@@ -124,18 +134,30 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
                 } else if ((mBufferInfo.flags and MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
                     // 表示当前缓冲区携带的是编码器的初始化信息，并不是媒体数据
                     Log.i(TAG, "BUFFER_FLAG_CODEC_CONFIG: ")
-                } else if ((mBufferInfo.flags and MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0) {
+                } else{
                     // 当前缓冲区是关键帧信息
-                    Log.i(TAG, "BUFFER_FLAG_KEY_FRAME: ")
-                    byteBuffer?.position(mBufferInfo.offset)
-                    byteBuffer?.limit(mBufferInfo.offset + mBufferInfo.size)
+                    if((mBufferInfo.flags and MediaCodec.BUFFER_FLAG_KEY_FRAME) != 0){
+                        Log.i(TAG, "BUFFER_FLAG_KEY_FRAME: ")
+                    }
+                    val videoArray = ByteArray(mBufferInfo.size)
+                    byteBuffer?.let {
+                        it.position(mBufferInfo.offset)
+                        it.limit(mBufferInfo.offset + mBufferInfo.size)
+                        it.get(videoArray,mBufferInfo.offset,mBufferInfo.size)
+                    }
                     mediaMuxer?.writeSampleData(mTrackIndex, byteBuffer!!, mBufferInfo)
                     mMediaCodec.releaseOutputBuffer(outputBufferIndex, false)
-                } else {
-                    byteBuffer?.position(mBufferInfo.offset)
-                    byteBuffer?.limit(mBufferInfo.offset + mBufferInfo.size)
-                    mediaMuxer?.writeSampleData(mTrackIndex, byteBuffer!!, mBufferInfo)
-                    mMediaCodec.releaseOutputBuffer(outputBufferIndex, false)
+
+                    val copy = MediaCodec.BufferInfo()
+                    copy.set(mBufferInfo.offset,mBufferInfo.size,
+                        mBufferInfo.presentationTimeUs,mBufferInfo.flags)
+                    val pkt = MediaPacket().apply {
+                        info = copy
+                        data = ByteBuffer.wrap(videoArray)
+                        medieType = true
+                        pts = info!!.presentationTimeUs
+                    }
+                    dataListener?.notifyAvailableData(pkt)
                 }
             }
         }

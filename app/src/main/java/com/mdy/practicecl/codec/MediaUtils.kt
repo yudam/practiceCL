@@ -2,7 +2,7 @@ package com.mdy.practicecl.codec
 
 import android.media.MediaCodecList
 import android.util.Log
-import java.io.FileInputStream
+import kotlin.experimental.and
 
 /**
  * User: maodayu
@@ -35,20 +35,4 @@ object MediaUtils {
         }
     }
 
-
-    /**
-     *  H264编码：
-     *    NAL层（视频数据网络抽象层）：将一帧拆分成多个包进行传输，所有的拆包和组包都是通过NAL层处理
-     *    VCL层（视频数据编码层）：对视频原始数据进行压缩
-     *
-     * H264码流结构：
-     *    SODB（原始数据比特流）：VCL层产生的数据流
-     *    RBSP（编码后的数据流）：
-     *    EBSP（）： 生成编码后的数据流后需要人为在每一帧之前加一个起始位
-     *    NALU： NALU头部 + NALU主体
-     *
-     *
-     *
-     *     NALU头部
-     */
 }

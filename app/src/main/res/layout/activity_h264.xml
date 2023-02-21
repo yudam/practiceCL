@@ -21,14 +21,13 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="10dp"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/video_texture1" />
 
 
-    <Button
+    <TextView
         android:id="@+id/btn_264_encoder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -39,15 +38,15 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <Button
+    <TextView
         android:id="@+id/btn_264_decoder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
         android:text="H264解码"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_264_encoder" />
+        app:layout_constraintBottom_toBottomOf="parent" />
 
 
     <TextView

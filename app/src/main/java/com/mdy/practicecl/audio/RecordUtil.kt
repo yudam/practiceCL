@@ -55,7 +55,8 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
      */
     private fun executeWriteAudio() {
         while (isRecord) {
-            val buf = ByteBuffer.allocateDirect(1024*6)
+            // 这里设置为4096和字节
+            val buf = ByteBuffer.allocateDirect(1024*4)
             val len = audioRecord?.read(buf, buf.capacity()) ?: 0
             Log.i(TAG, "录音数据写入:  $len")
             if (len > 0 && len <= buf.capacity()) {

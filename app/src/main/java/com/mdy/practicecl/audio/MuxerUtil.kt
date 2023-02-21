@@ -16,33 +16,54 @@ import java.nio.ByteBuffer
  *
  * 当编码器没输出一次数据，即可认为输出一帧AAC数据，一帧AAC数据包括1024个采样点
  */
-class MuxerUtil(val path: String) {
+class MuxerUtil(val videoPath: String) {
 
-    private lateinit var mMuxer: MediaMuxer
+    private var mMuxer: MediaMuxer = MediaMuxer(videoPath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 
-    private var audioTrackIndex: Int = 0
+    @Volatile
+    private var isStart: Boolean = false
 
-    init {
-        val filePath = path + ".mp4"
-        mMuxer = MediaMuxer(filePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
-    }
+    @Volatile
+    private var isStop: Boolean = false
+    private var mAudioTrackIndex: Int = -1
+    private var mVideoTrackIndex: Int = -1
 
 
-    fun addTrack(mediaFormat: MediaFormat) {
-        Log.i("MuxerUtil", "addTrack: ")
-        audioTrackIndex = mMuxer.addTrack(mediaFormat)
+    fun addTrack(mediaFormat: MediaFormat, isAudio: Boolean = false) {
+        Log.i("MuxerUtil", "isAudio: " + isAudio)
+        if (isAudio) {
+            mAudioTrackIndex = mMuxer.addTrack(mediaFormat)
+        } else {
+            mVideoTrackIndex = mMuxer.addTrack(mediaFormat)
+        }
+
+
         mMuxer.start()
+//        if (mAudioTrackIndex != -1 && mVideoTrackIndex != -1) {
+//            mMuxer.start()
+//            isStart = true
+//        }
     }
 
 
-    fun putStream(dataBuffer: ByteBuffer,bufferInfo:MediaCodec.BufferInfo) {
-        Log.i("MuxerUtil", "putStream: "+dataBuffer.remaining()+"   size:"+dataBuffer.capacity())
-        mMuxer.writeSampleData(audioTrackIndex,dataBuffer,bufferInfo)
+    fun writeSampleData(dataBuffer: ByteBuffer, bufferInfo: MediaCodec.BufferInfo, isAudio: Boolean = false) {
+        //  if (!isStart) return
+        if (isStop) return
+        if (isAudio) {
+            Log.i("MuxerUtil", "writeSampleData: audio")
+            mMuxer.writeSampleData(mAudioTrackIndex, dataBuffer, bufferInfo)
+        } else {
+            Log.i("MuxerUtil", "writeSampleData: video ")
+            mMuxer.writeSampleData(mVideoTrackIndex, dataBuffer, bufferInfo)
+        }
     }
 
 
-    fun release(){
+    @Synchronized
+    fun release() {
         Log.i("MuxerUtil", "release: ")
+        //if (isStop) return
+        isStop = true
         mMuxer.stop()
         mMuxer.release()
     }

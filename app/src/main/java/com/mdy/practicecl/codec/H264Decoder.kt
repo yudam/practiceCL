@@ -10,7 +10,7 @@ import java.nio.ByteBuffer
 import kotlin.concurrent.thread
 
 /**
- *  H264流解码
+ *  H264流解码,需要sps和pps参数，一般可在MediaFotmat的csd-0和csd-1中获取到
  */
 class H264Decoder(val surface: Surface, val filePath: String) {
 
@@ -63,6 +63,8 @@ class H264Decoder(val surface: Surface, val filePath: String) {
             if (inputIndex >= 0) {
                 val inputBuffer = mMediaCodec.getInputBuffer(inputIndex)
                 val byteLength = readH264Data(inputBuffer!!)
+
+
                 mMediaCodec.queueInputBuffer(inputIndex, 0, byteLength, 0, 0)
             }
 
@@ -78,6 +80,8 @@ class H264Decoder(val surface: Surface, val filePath: String) {
      */
     private fun readH264Data(byteBuffer: ByteBuffer): Int {
         val nalData = getNAL()
+
+        Log.i("H264Decoder", "readH264Data: "+nalData[0].toInt())
         byteBuffer.clear()
         byteBuffer.put(nalData)
         return nalData.size
@@ -138,8 +142,35 @@ class H264Decoder(val surface: Surface, val filePath: String) {
         //rf回退reWind个字节，回退到启动码
         val setPos = rf.filePointer - reWind
         rf.seek(setPos)
-        Log.i("H264Decoder", "frameData: "+frameData.size)
         return frameData
+    }
+
+
+    /**
+     * 查找sps
+     */
+    private fun findSps(bytes: ByteArray,offset: Int):Boolean{
+       if(findStartCode4(bytes, offset)){
+
+          return bytes[offset+4].toInt() == 0x67
+       } else if(findStartCode3(bytes, offset)){
+           return bytes[offset+3].toInt() == 0x67
+       }
+        return bytes[offset+4].toInt() == 0x67
+    }
+
+
+    /**
+     * 查找pps
+     */
+    private fun findPps(bytes: ByteArray,offset: Int):Boolean{
+        if(findStartCode4(bytes, offset)){
+
+            return bytes[offset+4].toInt() == 0x68
+        } else if(findStartCode3(bytes, offset)){
+            return bytes[offset+3].toInt() == 0x68
+        }
+        return false
     }
 
 

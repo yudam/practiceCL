@@ -12,7 +12,8 @@ import java.nio.ByteBuffer
 class MediaPacket {
 
     var data: ByteBuffer? = null
-    var dataInfo: MediaCodec.BufferInfo? = null
-    var pts: Long? = null
+    var info: MediaCodec.BufferInfo? = null
+    var pts: Long = -1
     var meidaFormat: MediaFormat? = null
+    var medieType:Boolean = false
 }

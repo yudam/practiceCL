@@ -11,6 +11,7 @@ import androidx.core.app.ActivityCompat
 import com.mdy.practicecl.codec.H264Activity
 import com.mdy.practicecl.codec.MediaUtils
 import com.mdy.practicecl.databinding.ActivityMainBinding
+import com.mdy.practicecl.muxer.MuxerActivity
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -87,6 +88,22 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
+        binding.btnMuxer.setOnClickListener {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), 123)
+            } else if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA),
+                    124)
+            } else {
+                start(MuxerActivity::class.java)
+            }
+
+        }
     }
 
 
