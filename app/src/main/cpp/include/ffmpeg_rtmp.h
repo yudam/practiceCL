@@ -20,12 +20,11 @@ class ffmpeg_rtmp {
 
 private:
 
-    AVFormatContext *ifmt_ctx;
-    AVFormatContext *ofmt_ctx;
+    AVFormatContext *ifmt_ctx = NULL;
+    AVFormatContext *ofmt_ctx = NULL;
 
-    char *in_filename = "/storage/9016-4EF8/VideoRecord/20221110-194720.mp4";
-    char *out_filename = "rtmp://box-stream-push-test.yololiv.com/yololiv/1004690261428666369?txSecret=15afbe687082490c46364c86ad3f9e5e&txTime=76b8c856";
-
+    char *in_filename = "/Users/mdy/Desktop/Andoird_studio/practiceCL/app/src/main/cpp/media_muxer.mp4";
+    char *out_filename = "rtmp://box-stream-push-test.yololiv.com/yololiv/1007168844428476417?txSecret=4aedb345e30150f8be854ee1252ffc22&txTime=76c1ccb2";
 
 public:
 

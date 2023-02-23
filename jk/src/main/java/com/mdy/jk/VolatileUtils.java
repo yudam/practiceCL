@@ -24,11 +24,15 @@ public class VolatileUtils {
 
     public static void main(String[] args) {
 
-        float time = (1024f / 44100f) ;
-        float time2 = time * (1000 * 1000 * 1000);
+        int audioProfile = 2;
+        int sampleIndex = 4;
+        int channelConfig = 2;
+        byte[] adtsAudioHeader = new byte[2];
+        adtsAudioHeader[0] = (byte) ((audioProfile << 3) | (sampleIndex >> 1));
+        adtsAudioHeader[1] = (byte) ((byte) ((sampleIndex << 7) & 0x80) | (channelConfig << 3));
 
-        System.out.println(time +"      " + time2);
 
+        System.out.println("0:  "+adtsAudioHeader[0]+"  1:   "+adtsAudioHeader[1]);
 
 //        for (int i = 0; i < 10; i++) {
 //

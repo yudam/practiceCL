@@ -25,9 +25,9 @@ void ffmpeg_rtmp::init() {
     /**  1. 初始化文件读取模块 */
 
     // 打开输入文件，初始化输入视频码流的AVFormatContext
-    ret = avformat_open_input(&ifmt_ctx, in_filename, NULL, NULL);
-    if (  ret < 0) {
-        LOGI(" 打不开输入文件   ");
+    ret = avformat_open_input(&ifmt_ctx, in_filename, 0, NULL);
+    if (ret < 0) {
+        LOGI(" 打不开输入文件  : %s",in_filename);
         return;
     } else {
         LOGI("  avformat_open_input  %d ",ret);

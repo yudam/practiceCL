@@ -6,6 +6,7 @@
 #include <android/log.h>
 #include "ffmpeg_play.h"
 #include "ffmpeg_rtmp.h"
+#include "ffmpeg_decoder.h"
 
 /**
  * static修饰的全局变量
@@ -13,6 +14,8 @@
 static ffmpeg_play *mFFmpegPlay = nullptr;
 
 static ffmpeg_rtmp * ffmpegRtmp = nullptr;
+
+static ffmpeg_decoder * ffmpegDecoder = nullptr;
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"ffmpeg",__VA_ARGS__)
 
@@ -50,4 +53,15 @@ Java_com_mdy_practicecl_FFmpegctivity_stopRtmp(JNIEnv *env, jobject thiz) {
         ffmpegRtmp->release();
         ffmpegRtmp = nullptr;
     }
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_com_mdy_practicecl_FFmpegctivity_startDecoder(JNIEnv *env, jobject thiz, jstring url, jobject surface) {
+
+    if(ffmpegDecoder == nullptr){
+        ffmpegDecoder = new ffmpeg_decoder();
+    }
+    ffmpegDecoder->onPrepare(env,surface);
+    const char * m_url = env->GetStringUTFChars(url, nullptr);
+    ffmpegDecoder->onDecoder(m_url);
 }
