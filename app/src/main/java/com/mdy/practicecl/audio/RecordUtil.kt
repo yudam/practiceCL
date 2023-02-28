@@ -39,6 +39,9 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
     }
 
     private fun initAudioRecord() {
+
+
+
         bufferSize = AudioRecord.getMinBufferSize(sampleRate,
             AudioFormat.CHANNEL_IN_STEREO,
             AudioFormat.ENCODING_PCM_16BIT)

@@ -23,27 +23,23 @@ void ffmpeg_rtmp::init() {
     avformat_network_init();
 
     /**  1. 初始化文件读取模块 */
+    ifmt_ctx = avformat_alloc_context();
 
     // 打开输入文件，初始化输入视频码流的AVFormatContext
-    ret = avformat_open_input(&ifmt_ctx, in_filename, 0, NULL);
-    if (ret < 0) {
+    if(avformat_open_input(&ifmt_ctx, in_filename, NULL, NULL) < 0){
         LOGI(" 打不开输入文件  : %s",in_filename);
         return;
-    } else {
-        LOGI("  avformat_open_input  %d ",ret);
     }
 
     // 通过AVFormatContext获取媒体信息
-    ret = avformat_find_stream_info(ifmt_ctx, NULL);
-    if ( ret < 0) {
+    if(avformat_find_stream_info(ifmt_ctx, NULL) < 0){
         LOGI(" 输入流信息错误 ");
         return;
-    }else {
-        LOGI("  avformat_find_stream_info  %d ",ret);
     }
 
+
     for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
-        if (ifmt_ctx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO) {
+        if (ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
             videoIndex = i;
             break;
         }

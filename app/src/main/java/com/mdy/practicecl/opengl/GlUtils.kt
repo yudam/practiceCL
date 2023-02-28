@@ -168,4 +168,10 @@ object GlUtils {
 //        Log.i("MDY", "mvpMatrix: " + mvpMatrix.toList().toString())
         return modelMatrix
     }
+
+
+    /**
+     * 模型矩阵的缩放有点意思，放大width，height，其实是方法width*2，height*2
+     *
+     */
 }

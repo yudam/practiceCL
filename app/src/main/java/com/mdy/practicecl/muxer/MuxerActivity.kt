@@ -1,21 +1,14 @@
 package com.mdy.practicecl.muxer
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.graphics.ImageFormat
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.TextureView
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
 import com.mdy.practicecl.audio.AACEncoder
 import com.mdy.practicecl.audio.RecordUtil
-import com.mdy.practicecl.codec.H264Activity
-import com.mdy.practicecl.codec.H264Decoder
 import com.mdy.practicecl.codec.H264Encoder
-import com.mdy.practicecl.databinding.ActivityH264Binding
 import com.mdy.practicecl.databinding.ActivityMuxerBinding
 import java.io.File
 

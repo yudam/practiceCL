@@ -74,7 +74,7 @@ class FFmpegctivity : AppCompatActivity() {
 
     external fun stopRtmp()
 
-    external fun startDecoder(url:String,surface: Surface)
+    private external fun startDecoder(url:String, surface: Surface)
 
 
     private fun getVideoFromSDCard(): List<String> {

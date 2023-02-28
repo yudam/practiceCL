@@ -10,7 +10,6 @@ import android.util.Log
 import android.view.TextureView
 import androidx.appcompat.app.AppCompatActivity
 import com.mdy.practicecl.databinding.ActivityEglactivityBinding
-import com.mdy.practicecl.opengl.Camera1
 import com.mdy.practicecl.opengl.EglCore
 import com.mdy.practicecl.opengl.GLDrawableUtils
 import com.mdy.practicecl.opengl.GlUtils

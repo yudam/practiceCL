@@ -10,7 +10,12 @@ import java.nio.ByteOrder
  * Time: 15:41
  */
 object GLDrawableUtils {
-
+    var common_vertext_coord_full = floatArrayOf(
+        -1f, -1f,
+        1f, -1f,
+        -1f, 1f,
+        1f, 1f
+    )
 
     var common_vertext_coord = floatArrayOf(
         -0.5f, -0.5f,

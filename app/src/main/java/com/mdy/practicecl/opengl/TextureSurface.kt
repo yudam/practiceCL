@@ -13,9 +13,7 @@ import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 /**
- * User: maodayu
- * Date: 2023/1/6
- * Time: 15:37
+ * 简单的GlSurfaceView绘制一张图片
  */
 class TextureSurface(context: Context) : GLSurfaceView(context) {
 
@@ -30,7 +28,7 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
 
     val renderer = object : Renderer {
         override fun onSurfaceCreated(gl: GL10?, config: EGLConfig?) {
-            bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_tt_1)
+            bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_2)
             val vertext = GlUtils.readRawResourse(R.raw.simple_vertex_shader)
             val fragment = GlUtils.readRawResourse(R.raw.simple_fragment_shader)
             mTextureId = GlUtils.getTexture(bitmap)
@@ -46,12 +44,11 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
                 Matrix.setIdentityM(this, 0)
             }
             Matrix.translateM(modelMatrix, 0, cx.toFloat(), cy.toFloat(), 0f)
-            Matrix.scaleM(modelMatrix, 0, width.toFloat()/2, width.toFloat()/2, 1f)
+            Matrix.scaleM(modelMatrix, 0, 2f, 2f, 1f)
 
             val projectMatrix = FloatArray(16).apply {
-                Matrix.orthoM(this,0,0f,width.toFloat(),0f,height.toFloat(),-1f,1f)
+                Matrix.orthoM(this,0,cx.toFloat()-1f,cx.toFloat()+1f,cy.toFloat()-1,cy.toFloat()+1,-1f,1f)
             }
-
             Log.i("MDY", "projectMatrix: "+projectMatrix.toList().toString())
             Matrix.multiplyMM(matrix, 0, projectMatrix, 0, modelMatrix, 0)
         }
@@ -80,7 +77,7 @@ class TextureSurface(context: Context) : GLSurfaceView(context) {
         GLES20.glEnableVertexAttribArray(glPosition)
         GLES20.glEnableVertexAttribArray(glTexturePosition)
         GLES20.glVertexAttribPointer(glPosition, 2, GLES20.GL_FLOAT,
-            false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_vertext_coord))
+            false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_vertext_coord_full))
         GLES20.glVertexAttribPointer(glTexturePosition, 2, GLES20.GL_FLOAT,
             false, 0, GLDrawableUtils.getByteBuffer(GLDrawableUtils.common_fragment_coord))
 
