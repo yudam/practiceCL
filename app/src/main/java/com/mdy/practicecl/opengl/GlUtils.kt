@@ -25,12 +25,14 @@ object GlUtils {
      */
     fun loadShaders(type: Int, glsl: String): Int {
         val shader = GLES20.glCreateShader(type)
+        checkGlError("loadShaders-type")
         GLES20.glShaderSource(shader, glsl)
         GLES20.glCompileShader(shader)
+        checkGlError("loadShaders-Compile")
         val compiled = IntArray(1)
         GLES20.glGetShaderiv(shader, GLES20.GL_COMPILE_STATUS, compiled, 0)
         if (compiled[0] == 0) {
-            Log.i("MDY", "loadShaders failed: " + GLES20.glGetShaderInfoLog(shader))
+            Log.e("MDY", "loadShaders failed: " + GLES20.glGetShaderInfoLog(shader))
         }
         checkGlError("loadShaders")
         return shader
@@ -42,6 +44,7 @@ object GlUtils {
      */
     fun getProgram(vertextShader: String, fragmentShader: String): Int {
         val programId = GLES20.glCreateProgram()
+        checkGlError("glCreateProgram")
         val vertexId = loadShaders(GLES20.GL_VERTEX_SHADER, vertextShader)
         val fragmentId = loadShaders(GLES20.GL_FRAGMENT_SHADER, fragmentShader)
         Log.i("glError", "vertexId: " + vertexId + "   fragmentId:" + fragmentId)
@@ -106,6 +109,31 @@ object GlUtils {
         return intArray[0]
     }
 
+    fun getFboTextureId(isOES:Boolean,width:Int,height:Int):Int{
+
+        val intArray = IntArray(1)
+        GLES20.glGenTextures(1, intArray, 0)
+        if (isOES) {
+            GLES20.glBindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, intArray[0])
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_MIN_FILTER, GLES10.GL_NEAREST)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_MAG_FILTER, GLES10.GL_LINEAR)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_WRAP_S, GLES10.GL_CLAMP_TO_EDGE)
+            GLES20.glTexParameteri(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, GLES10.GL_TEXTURE_WRAP_T, GLES10.GL_CLAMP_TO_EDGE)
+            GLES20.glTexImage2D(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA,
+                GLES20.GL_UNSIGNED_BYTE, null)
+        } else {
+            GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, intArray[0])
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_MIN_FILTER, GLES10.GL_NEAREST)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_MAG_FILTER, GLES10.GL_LINEAR)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_WRAP_S, GLES10.GL_CLAMP_TO_EDGE)
+            GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES10.GL_TEXTURE_WRAP_T, GLES10.GL_CLAMP_TO_EDGE)
+            GLES20.glTexImage2D(GLES20.GL_TEXTURE_2D, 0, GLES20.GL_RGBA, width, height, 0, GLES20.GL_RGBA,
+                GLES20.GL_UNSIGNED_BYTE, null)
+        }
+        checkGlError("getTexture")
+        return intArray[0]
+    }
+
 
     fun checkGlError(op: String) {
         val error = GLES20.glGetError()
@@ -132,6 +160,9 @@ object GlUtils {
                 builder.append("\n")
             }
         } catch (e: Exception) {
+            Log.i("MDY", "readRawResourse: failed")
+        } finally {
+            bufferedReader.close()
         }
         return builder.toString()
     }

@@ -12,6 +12,7 @@ import com.mdy.practicecl.codec.H264Activity
 import com.mdy.practicecl.codec.MediaUtils
 import com.mdy.practicecl.databinding.ActivityMainBinding
 import com.mdy.practicecl.muxer.MuxerActivity
+import com.mdy.practicecl.player.VideoPlayActivity
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -103,6 +104,11 @@ class MainActivity : AppCompatActivity() {
                 start(MuxerActivity::class.java)
             }
 
+        }
+
+
+        binding.btnVideo.setOnClickListener {
+            start(VideoPlayActivity::class.java)
         }
     }
 

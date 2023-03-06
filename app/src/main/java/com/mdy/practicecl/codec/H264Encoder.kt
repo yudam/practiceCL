@@ -76,6 +76,28 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
         onFrame()
     }
 
+    /**
+     * 异步加载
+     */
+    private fun setCallback(){
+        mMediaCodec.setCallback(object :MediaCodec.Callback(){
+            override fun onInputBufferAvailable(codec: MediaCodec, index: Int) {
+               val inputBuffer =  mMediaCodec.getInputBuffer(index)
+            }
+
+            override fun onOutputBufferAvailable(codec: MediaCodec, index: Int, info: MediaCodec.BufferInfo) {
+               val outPutBuffer =  mMediaCodec.getOutputBuffer(index)
+            }
+
+            override fun onError(codec: MediaCodec, e: MediaCodec.CodecException) {
+            }
+
+            override fun onOutputFormatChanged(codec: MediaCodec, format: MediaFormat) {
+            }
+
+        })
+    }
+
     fun startEncoder() {
         isEncoder = true
     }

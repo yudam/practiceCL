@@ -19,7 +19,8 @@ static ffmpeg_decoder * ffmpegDecoder = nullptr;
 
 #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,"ffmpeg",__VA_ARGS__)
 
-extern "C"
+extern "C" {
+
 JNIEXPORT jboolean JNICALL
 Java_com_mdy_practicecl_FFmpegctivity_ffmpegCreate(JNIEnv *env, jobject thiz) {
     if (mFFmpegPlay == nullptr) {
@@ -28,7 +29,7 @@ Java_com_mdy_practicecl_FFmpegctivity_ffmpegCreate(JNIEnv *env, jobject thiz) {
     return mFFmpegPlay != nullptr;
 }
 
-extern "C"
+
 JNIEXPORT jboolean JNICALL
 Java_com_mdy_practicecl_FFmpegctivity_ffmpegRelease(JNIEnv *env, jobject thiz) {
 
@@ -37,16 +38,21 @@ Java_com_mdy_practicecl_FFmpegctivity_ffmpegRelease(JNIEnv *env, jobject thiz) {
         mFFmpegPlay = nullptr;
     }
 }
-extern "C"
+
 JNIEXPORT void JNICALL
-Java_com_mdy_practicecl_FFmpegctivity_startRtmp(JNIEnv *env, jobject thiz) {
+Java_com_mdy_practicecl_FFmpegctivity_startRtmp(JNIEnv *env, jobject thiz, jstring url, jstring rtmp_url) {
 
     if(ffmpegRtmp == nullptr){
         ffmpegRtmp = new ffmpeg_rtmp();
     }
+    const char * m_url = env->GetStringUTFChars(url, nullptr);
+
+    const char * m_rtmp = env->GetStringUTFChars(rtmp_url, nullptr);
+
+    ffmpegRtmp->preInit(m_url,m_rtmp);
     ffmpegRtmp->init();
 }
-extern "C"
+
 JNIEXPORT void JNICALL
 Java_com_mdy_practicecl_FFmpegctivity_stopRtmp(JNIEnv *env, jobject thiz) {
     if(ffmpegRtmp != nullptr){
@@ -54,7 +60,7 @@ Java_com_mdy_practicecl_FFmpegctivity_stopRtmp(JNIEnv *env, jobject thiz) {
         ffmpegRtmp = nullptr;
     }
 }
-extern "C"
+
 JNIEXPORT void JNICALL
 Java_com_mdy_practicecl_FFmpegctivity_startDecoder(JNIEnv *env, jobject thiz, jstring url, jobject surface) {
 
@@ -64,4 +70,5 @@ Java_com_mdy_practicecl_FFmpegctivity_startDecoder(JNIEnv *env, jobject thiz, js
     ffmpegDecoder->onPrepare(env,surface);
     const char * m_url = env->GetStringUTFChars(url, nullptr);
     ffmpegDecoder->onDecoder(m_url);
+}
 }

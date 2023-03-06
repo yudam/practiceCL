@@ -15,7 +15,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
         private const val TAG = "EglCore"
     }
 
-    private var mEGLDisplay = EGL14.EGL_NO_DISPLAY
+     var mEGLDisplay = EGL14.EGL_NO_DISPLAY
     private var mEGLContext = EGL14.EGL_NO_CONTEXT
     private var mEGLConfig: EGLConfig?
 
@@ -24,12 +24,12 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
          * 1. 创建与本地窗口系统之间的连接，返回的EGLDisplay对象，可以抽象理解为设备的显示设备
          */
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
-            Log.i(TAG, "EGL already set up")
+            Log.e(TAG, "EGL already set up")
         }
 
         mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY)
         if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
-            Log.i(TAG, "创建EGLDisplay失败")
+            Log.e(TAG, "创建EGLDisplay失败")
         }
 
         /**
@@ -38,7 +38,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
         val version = IntArray(2)
         if (!EGL14.eglInitialize(mEGLDisplay, version, 0, version, 1)) {
             mEGLDisplay = null
-            Log.i(TAG, "unable to initialize EGL14")
+            Log.e(TAG, "unable to initialize EGL14")
         }
 
         /**
@@ -61,7 +61,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
         // 3. 所有符合的EGLConfig个数
         val numConfigs = IntArray(1)
         if (!EGL14.eglChooseConfig(mEGLDisplay, mEGLConfigAttr, 0, configs, 0, configs.size, numConfigs, 0)) {
-            Log.i(TAG, "EGLConfig选择配置失败")
+            Log.e(TAG, "EGLConfig选择配置失败")
         }
         mEGLConfig = configs[0]
 
@@ -80,7 +80,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
 
         val values = intArrayOf(1)
         EGL14.eglQueryContext(mEGLDisplay, mEGLContext, EGL14.EGL_CONTEXT_CLIENT_VERSION, values, 0)
-        Log.i(TAG, "EGLContext created, client version: " + values[0])
+        Log.e(TAG, "EGLContext created, client version: " + values[0])
     }
 
     /**
@@ -105,7 +105,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
             GlUtils.checkGlError("eglCreateWindowSurface ")
             mEGLSurface
         } else {
-            Log.i(TAG, "createWindowSurface: surface is invalid")
+            Log.e(TAG, "createWindowSurface: surface is invalid")
             null
         }
     }
@@ -117,10 +117,10 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
      */
     fun makeCurrent(eglSurface: EGLSurface) {
         if(mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
-            Log.i(TAG, "makeCurrent: 需要先创建mEGLDisplay")
+            Log.e(TAG, "makeCurrent: 需要先创建mEGLDisplay")
         }
         if(!EGL14.eglMakeCurrent(mEGLDisplay, eglSurface, eglSurface, mEGLContext)){
-            Log.i(TAG, "makeCurrent: failed")
+            Log.e(TAG, "makeCurrent: failed")
         }
     }
 
@@ -130,7 +130,7 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
      */
     fun swapBuffers(eglSurface: EGLSurface) {
         if (!EGL14.eglSwapBuffers(mEGLDisplay, eglSurface)) {
-            Log.i(TAG, "swapBuffers 错误")
+            Log.e(TAG, "swapBuffers 错误")
         }
     }
 

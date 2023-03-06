@@ -31,6 +31,13 @@ object GLDrawableUtils {
         1f, 0f
     )
 
+    var common_fbo_fragment_coord = floatArrayOf(
+        0f,0f,
+        1f, 0f,
+        0f, 1f,
+        1f, 1f
+    )
+
 
     fun getByteBuffer(array: FloatArray): Buffer {
         return ByteBuffer.allocateDirect(array.size * Float.SIZE_BYTES)

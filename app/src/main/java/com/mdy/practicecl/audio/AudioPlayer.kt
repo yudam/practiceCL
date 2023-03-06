@@ -19,7 +19,7 @@ class AudioPlayer :AudioFrameCallback{
     /**
      * 采样率
      */
-    private val sampleRate = 44100
+    private val sampleRate = 48000
 
     /**
      * 通道数
@@ -62,6 +62,8 @@ class AudioPlayer :AudioFrameCallback{
         } else {
             4096
         }
+
+        Log.i(TAG, "write: "+audioData.remaining())
         audioTrack?.write(audioData, buffSize, AudioTrack.WRITE_BLOCKING)
     }
 

@@ -39,9 +39,11 @@ class FFmpegctivity : AppCompatActivity() {
         })
 
         binding.btnStartRtmp.setOnClickListener {
-               startRtmp()
-//            val videoList = getVideoFromSDCard()
-//            Log.i("MDY", "onCreate: ")
+            val resList = getVideoFromSDCard()
+            val videoPath = resList.find { it.endsWith("4254.mp4") } ?: resList[0]
+            if(resList.isNotEmpty()){
+                startRtmp(videoPath,"rtmp://172.16.0.97:1935/live/room")
+            }
 
         }
 
@@ -70,7 +72,7 @@ class FFmpegctivity : AppCompatActivity() {
 
     external fun ffmpegRelease(): Boolean
 
-    external fun startRtmp()
+    external fun startRtmp(url:String,rtmpUrl:String)
 
     external fun stopRtmp()
 

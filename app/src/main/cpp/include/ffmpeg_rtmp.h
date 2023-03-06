@@ -14,19 +14,22 @@ extern "C" {
 #include "libavformat/avformat.h"
 #include "include/libavutil/mathematics.h"
 #include "include/libavutil/time.h"
+#include "libavutil/log.h"
 };
 
 class ffmpeg_rtmp {
 
 private:
 
-    AVFormatContext *ifmt_ctx = NULL;
-    AVFormatContext *ofmt_ctx = NULL;
+    AVFormatContext *ifmt_ctx;
+    AVFormatContext *ofmt_ctx;
 
-    char *in_filename = "/Users/mdy/Desktop/Andoird_studio/practiceCL/app/src/main/cpp/media_muxer.mp4";
-    char *out_filename = "rtmp://box-stream-push-test.yololiv.com/yololiv/1007168844428476417?txSecret=4aedb345e30150f8be854ee1252ffc22&txTime=76c1ccb2";
+    const char *in_filename;
+    const char *out_filename;
 
 public:
+
+    void preInit(const char * url,const char * rtmp);
 
     void init();
 
