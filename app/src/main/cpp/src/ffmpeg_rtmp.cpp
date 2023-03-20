@@ -17,7 +17,7 @@ char libffmpeg_log_buf[LOG_BUF_SIZE];
  * 设置ffmpeg的日志回调，用于打印输出
  * 这里设置的日志级别是AV_LOG_ERROR，也就是错误日志的输出
  */
-static void yunxi_ffmpeg_log_callback(void *ptr, int level, const char *fmt, va_list vl){
+static void yunxi_ffmpeg_log_callback(void *ptr, int level, const char *fmt, va_list vl) {
     int cnt;
     memset(libffmpeg_log_buf_prefix, 0, LOG_BUF_PREFIX_SIZE);
     memset(libffmpeg_log_buf, 0, LOG_BUF_SIZE);
@@ -25,12 +25,11 @@ static void yunxi_ffmpeg_log_callback(void *ptr, int level, const char *fmt, va_
     cnt = snprintf(libffmpeg_log_buf_prefix, LOG_BUF_PREFIX_SIZE, "%s", fmt);
     cnt = vsnprintf(libffmpeg_log_buf, LOG_BUF_SIZE, libffmpeg_log_buf_prefix, vl);
 
-    if(level == AV_LOG_ERROR){
+    if (level == AV_LOG_ERROR) {
         LOGI("%s", libffmpeg_log_buf);
     }
     return;
 }
-
 
 
 /**
@@ -50,10 +49,10 @@ void ffmpeg_rtmp::preInit(const char *url, const char *rtmp) {
  */
 void ffmpeg_rtmp::init() {
 
-    int videoIndex;
-    int frame_index = 0;
     int ret;
-    int64_t start_time;
+    int stream_index = 0;
+    int stream_mapping_size = 0;
+    int *stream_mapping = nullptr;
 
 
     AVPacket pkt;
@@ -67,7 +66,7 @@ void ffmpeg_rtmp::init() {
      * ifmt_ctx初始化为NULL，如果文件打开成功，ifmt_ctx会被设置成非NULL的值
      * avformat_open_input可以打开多种来源的数据，比如本地路径、rtmp拉流地址等
      */
-    if (avformat_open_input(&ifmt_ctx, in_filename, NULL, NULL) < 0) {
+    if (avformat_open_input(&ifmt_ctx, in_filename, nullptr, nullptr) < 0) {
         LOGI(" 打不开输入文件  : %s", in_filename);
         return;
     }
@@ -80,25 +79,8 @@ void ffmpeg_rtmp::init() {
         return;
     }
 
-
-    for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
-        if (ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoIndex = i;
-            break;
-        }
-    }
-
     // 打印关于输入或者输出格式的详细信息，包括比特率，流，容器等数据，最后一个参数0代表输入，1代表输出
     av_dump_format(ifmt_ctx, 0, in_filename, 0);
-//
-//    LOGI("av_dump_format   %d ", videoIndex);
-//
-//    const char *mime_type = ifmt_ctx->iformat->mime_type;
-//
-//    const char *name = ifmt_ctx->iformat->name;
-//
-//
-//    LOGI("duration =   %d  bitrate = %d    filename = %s  name = %s   mime = %s", ifmt_ctx->duration, ifmt_ctx->bit_rate, ifmt_ctx->filename, name, mime_type);
 
     /**
      * 2. 初始化ffmpeg输出模块
@@ -106,25 +88,47 @@ void ffmpeg_rtmp::init() {
      * 输出流采用flv格式
      */
 
-    avformat_alloc_output_context2(&ofmt_ctx, NULL, "flv", out_filename);
+    avformat_alloc_output_context2(&ofmt_ctx, nullptr, "flv", out_filename);
 
     if (!ofmt_ctx) {
         LOGI(" 创建 ofmt_ctx 失败 ");
         return;
     }
 
+    stream_mapping_size = ifmt_ctx->nb_streams;
+    stream_mapping = static_cast<int *>(av_mallocz_array(stream_mapping_size, sizeof(*stream_mapping)));
+
     AVOutputFormat *ofmt = ofmt_ctx->oformat;
+
+    AVRational frame_rate;
+    double duration;
 
     /**
      * 遍历输入流的所有轨道，拷贝编解码参数到输出流
      * 注意的是如果视频轨道超出1个，则后续avformat_write_header会一直返回失败-22
      */
     for (int i = 0; i < ifmt_ctx->nb_streams; i++) {
+        AVStream *out_stream;
         AVStream *in_stream = ifmt_ctx->streams[i];
-        LOGI("stream is : %d    is video:  %d",in_stream->codecpar->codec_tag,in_stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO);
+        AVCodecParameters *codecpar = in_stream->codecpar;
 
+        if (codecpar->codec_type != AVMEDIA_TYPE_VIDEO &&
+            codecpar->codec_type != AVMEDIA_TYPE_AUDIO &&
+            codecpar->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+            stream_mapping[i] = -1;
+            continue;
+        }
+
+        if (codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+            frame_rate = av_guess_frame_rate(ifmt_ctx, in_stream, nullptr);
+            duration = (frame_rate.num && frame_rate.den ? av_q2d((AVRational) {frame_rate.den, frame_rate.num}) : 0);
+        }
+
+        stream_mapping[i] = stream_index++;
+
+        LOGI("stream is : %d    is video:  %d", codecpar->codec_tag, codecpar->codec_type == AVMEDIA_TYPE_VIDEO);
         // 根据输入流创建输出码流的AVStream
-        AVStream *out_stream = avformat_new_stream(ofmt_ctx, in_stream->codec->codec);
+        out_stream = avformat_new_stream(ofmt_ctx, nullptr);
         if (!out_stream) {
             LOGI(" 输出流失败 ");
             return;
@@ -139,11 +143,6 @@ void ffmpeg_rtmp::init() {
 
         // codec_tag要重置为0，否则后续的avformat_write_header可能返回失败
         out_stream->codecpar->codec_tag = 0;
-        out_stream->codec->codec_tag = 0;
-        if (ofmt_ctx->oformat->flags & AVFMT_GLOBALHEADER) {
-            out_stream->codec->flags = out_stream->codec->flags | CODEC_FLAG_GLOBAL_HEADER;
-        }
-
     }
 
     // 打印输出流的格式信息
@@ -151,7 +150,7 @@ void ffmpeg_rtmp::init() {
 
 
     if (!(ofmt->flags & AVFMT_NOFILE)) {
-        // 打开输出文件
+        // 创建并初始化一个AVIOContext，用来访问URL指定的资源
         ret = avio_open(&ofmt_ctx->pb, out_filename, AVIO_FLAG_WRITE);
         if (ret < 0) {
             LOGI(" 输入URL打不开： %s", out_filename);
@@ -162,7 +161,7 @@ void ffmpeg_rtmp::init() {
     AVCodecParameters *codecpar = ofmt_ctx->streams[0]->codecpar;
 
     LOGI("bit_rate: %d  ,  width: %d , height: %d  ,  codec_tag: %d ",
-         codecpar->bit_rate,codecpar->width,codecpar->height,codecpar->codec_tag);
+         codecpar->bit_rate, codecpar->width, codecpar->height, codecpar->codec_tag);
 
 
     // 写头文件
@@ -172,73 +171,35 @@ void ffmpeg_rtmp::init() {
         LOGI(" 写入头文件失败 ：%d", ret);
         return;
     }
-    /** 3. 读取ts流的每一帧，并进行时间基转换，然后推流到RTMP服务器*/
-    start_time = av_gettime();
 
+    /**
+     * 循环读取packet，然后推流
+     */
     while (1) {
+
         AVStream *in_stream, *out_stream;
 
+        // 从输入流中读取一个packet
         ret = av_read_frame(ifmt_ctx, &pkt);
-
+        //  -541478725表示文件读取结束
         if (ret < 0) {
-            LOGI(" av_read_frame 失败 ");
             break;
         }
 
-        // 写入pts
-        if (pkt.pts == AV_NOPTS_VALUE) {
-            // time_base：时基，通过该值可以将pts和dts转化为真正的时间
-            AVRational time_base1 = ifmt_ctx->streams[videoIndex]->time_base;
-            // 计算两帧之间的时间
-            int64_t calc_duration = (double) AV_TIME_BASE / av_q2d(ifmt_ctx->streams[videoIndex]->r_frame_rate);
-            // 匹配参数
-            pkt.pts = double(frame_index * calc_duration) / (double) (av_q2d(time_base1) * AV_TIME_BASE);
-            pkt.dts = pkt.pts;
-            pkt.duration = (double) calc_duration / (double) (av_q2d(time_base1) * AV_TIME_BASE);
-        }
-
-        // 延迟发送，防止发送过快
-        if (pkt.stream_index == videoIndex) {
-            AVRational time_base = ifmt_ctx->streams[videoIndex]->time_base;
-            AVRational time_base_q = {1, AV_TIME_BASE};
-            //计算视频播放时长
-            int64_t pts_time = av_rescale_q(pkt.dts, time_base, time_base_q);
-            //计算实际视频的播放时长
-            int64_t now_time = av_gettime() - start_time;
-
-            if (pts_time > now_time) {
-                // 睡眠一段时间，目的是实现播放时间同步
-                av_usleep(pts_time - now_time);
-            }
-        }
-
+        // 根据packet中stream_index获取输入的AVStream
         in_stream = ifmt_ctx->streams[pkt.stream_index];
+        int codec_type = in_stream->codecpar->codec_type;
+        // 根据视频的时间戳来休眠指定时间
+        if (codec_type == AVMEDIA_TYPE_VIDEO) {
+            LOGI("   sleep  time : %d", duration * AV_TIME_BASE);
+            av_usleep((int64_t) (duration * AV_TIME_BASE));
+        }
+
+        // 根据packet中stream_index获取输出的AVStream
         out_stream = ofmt_ctx->streams[pkt.stream_index];
-
-
-        pkt.pts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base, (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-        pkt.dts = av_rescale_q_rnd(pkt.pts, in_stream->time_base, out_stream->time_base, (AVRounding) (AV_ROUND_NEAR_INF | AV_ROUND_PASS_MINMAX));
-
-
-        // 可能pts < dts,直接下一帧
-        if(pkt.pts <0){
-            pkt.pts = 0;
-        }
-
-        if(pkt.dts < 0){
-            pkt.dts = 0;
-        }
-
-        if(pkt.pts < pkt.dts) continue;
-
-        pkt.duration = av_rescale_q(pkt.duration,in_stream->time_base,out_stream->time_base);
+        av_packet_rescale_ts(&pkt, in_stream->time_base, out_stream->time_base);
         pkt.pos = -1;
-        if (pkt.stream_index == videoIndex) {
-            LOGI(" send frame to screen  %d", frame_index);
-            frame_index++;
-        }
 
-        LOGI("  pts:  %d,   dts:  %d ,  duration:  %d",pkt.pts,pkt.dts,pkt.duration);
         // 将AVPacket（存储视频压缩码流）写入文件
         ret = av_interleaved_write_frame(ofmt_ctx, &pkt);
         if (ret < 0) {
@@ -257,7 +218,7 @@ void ffmpeg_rtmp::release() {
 
     avformat_close_input(&ifmt_ctx);
     if (ofmt_ctx && !(ofmt_ctx->flags & AVFMT_NOFILE)) {
-        avio_close(ofmt_ctx->pb);
+        avio_closep(&ofmt_ctx->pb);
     }
     avformat_free_context(ofmt_ctx);
 }

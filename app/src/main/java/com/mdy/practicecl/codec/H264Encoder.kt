@@ -4,6 +4,7 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
+import android.opengl.GLES20
 import android.util.Log
 import com.mdy.practicecl.Utils
 import com.mdy.practicecl.audio.MediaPacket
@@ -62,7 +63,7 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
 
 
     private fun initConfig() {
-        val mediaFormat = MediaFormat.createVideoFormat(mMimeType, 1080, 1920)
+        val mediaFormat = MediaFormat.createVideoFormat(mMimeType, 1920, 1080)
         // 选择对应的YUV4颜色格式
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
         mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30)

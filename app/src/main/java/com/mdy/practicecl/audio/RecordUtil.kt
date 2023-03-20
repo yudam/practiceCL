@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
+import android.media.audiofx.AcousticEchoCanceler
 import android.util.Log
 import com.mdy.practicecl.App
 import java.io.BufferedOutputStream
@@ -28,6 +29,18 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
     private var bufferSize: Int = 0
     private var isFirstFrame = true
 
+
+    /**
+     * 回音消除
+     * audioRecord可以获取一个SessionId，在创建AudioTrack的时候可以传入
+     */
+    private fun createAEC(){
+        val audioSessionId = audioRecord?.audioSessionId
+        if(AcousticEchoCanceler.isAvailable() && audioSessionId != null){
+            val acousticEchoCanceler = AcousticEchoCanceler.create(audioSessionId)
+            acousticEchoCanceler.enabled = true
+        }
+    }
 
 
     override fun run() {

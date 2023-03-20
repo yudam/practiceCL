@@ -40,7 +40,7 @@ class FFmpegctivity : AppCompatActivity() {
 
         binding.btnStartRtmp.setOnClickListener {
             val resList = getVideoFromSDCard()
-            val videoPath = resList.find { it.endsWith("4254.mp4") } ?: resList[0]
+            val videoPath = resList.find { it.endsWith("tdown.mp4") } ?: resList[0]
             if(resList.isNotEmpty()){
                 startRtmp(videoPath,"rtmp://172.16.0.97:1935/live/room")
             }

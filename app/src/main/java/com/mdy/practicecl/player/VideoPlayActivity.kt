@@ -12,6 +12,10 @@ import com.mdy.practicecl.audio.AudioPlayer
 import com.mdy.practicecl.databinding.ActivityVideoPlayBinding
 import kotlin.concurrent.thread
 
+/**
+ *  本地视频解码播放
+ *
+ */
 class VideoPlayActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityVideoPlayBinding
@@ -51,11 +55,11 @@ class VideoPlayActivity : AppCompatActivity() {
             val surfaceTexture = binding.videoView.surfaceTexture
 
 
-            val pipScene =  PipScene(surfaceTexture!!)
+            val pipScene = PipScene(surfaceTexture!!)
             pipScene.start()
             val surface = Surface(pipScene.getSurfaceTexture())
             val videoDecoder = VideoDecoder(videoPath, surface)
-            setVideoDisplay(pipScene,videoDecoder.getVideoWidth(),videoDecoder.getVideoHeight())
+            setVideoDisplay(pipScene, videoDecoder.getVideoWidth(), videoDecoder.getVideoHeight())
             thread {
                 audioDecoder.run()
             }

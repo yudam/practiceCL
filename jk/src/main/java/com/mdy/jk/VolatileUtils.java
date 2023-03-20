@@ -24,33 +24,23 @@ public class VolatileUtils {
 
     public static void main(String[] args) {
 
-        int audioProfile = 2;
-        int sampleIndex = 4;
-        int channelConfig = 2;
-        byte[] adtsAudioHeader = new byte[2];
-        adtsAudioHeader[0] = (byte) ((audioProfile << 3) | (sampleIndex >> 1));
-        adtsAudioHeader[1] = (byte) ((byte) ((sampleIndex << 7) & 0x80) | (channelConfig << 3));
+        for (int i = 0; i < 10; i++) {
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (int j = 0; j < 10000; j++) {
+                        increase();
+                    }
+                }
+            }).start();
+        }
 
 
-        System.out.println("0:  "+adtsAudioHeader[0]+"  1:   "+adtsAudioHeader[1]);
+        while (Thread.activeCount() > 1){
+            Thread.yield();
+        }
 
-//        for (int i = 0; i < 10; i++) {
-//
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    for (int j = 0; j < 10000; j++) {
-//                        increase();
-//                    }
-//                }
-//            }).start();
-//        }
-//
-//
-//        while (Thread.activeCount() > 1){
-//            Thread.yield();
-//        }
-//
-//        System.out.println(" vlEvent : " +vlEvent);
+        System.out.println(" vlEvent : " +vlEvent);
     }
 }

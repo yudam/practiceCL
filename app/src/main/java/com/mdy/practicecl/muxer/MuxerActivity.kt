@@ -12,6 +12,10 @@ import com.mdy.practicecl.codec.H264Encoder
 import com.mdy.practicecl.databinding.ActivityMuxerBinding
 import java.io.File
 
+/**
+ * 录制相机视频合成MP4
+ *
+ */
 class MuxerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMuxerBinding
