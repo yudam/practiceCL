@@ -26,23 +26,30 @@ class H264Activity : AppCompatActivity() {
         binding = ActivityH264Binding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        h264Encoder = H264Encoder(getVideoPath())
-        h264Encoder?.start()
-        cameraRender.setH264Encoder(h264Encoder!!)
-
-
-
-
-
-        binding.videoTexture1.surfaceTextureListener = cameraRender
-        binding.videoTexture2.surfaceTextureListener = EncoderRender(getVideoPath())
+//
+//        h264Encoder = H264Encoder(getVideoPath())
+//        h264Encoder?.start()
+//        cameraRender.setH264Encoder(h264Encoder!!)
+//
+//
+//
+//
+//
+//        binding.videoTexture1.surfaceTextureListener = cameraRender
+//        binding.videoTexture2.surfaceTextureListener = EncoderRender(getVideoPath())
 
         binding.btn264Encoder.setOnClickListener {
+
 
         }
 
         binding.btn264Decoder.setOnClickListener {
+        }
+
+        binding.btnNalu.setOnClickListener {
+
+            Log.i("H264", "onCreate: " + getVideoPath())
+            parseH264Stream(getVideoPath())
         }
     }
 
@@ -53,16 +60,9 @@ class H264Activity : AppCompatActivity() {
     }
 
 
-
     private fun getVideoPath(): String {
-        val path = cacheDir.absolutePath + "/media_surface.mp4"
-        val file = File(path)
-        if (!file.exists()) {
-            file.createNewFile()
-        } else {
-            file.delete()
-            file.createNewFile()
-        }
+       // val path = cacheDir.absolutePath + "/NewTextFile.txt"
+        val path = cacheDir.absolutePath + "/264.h264"
         return path
     }
 
@@ -107,9 +107,9 @@ class H264Activity : AppCompatActivity() {
 
     }
 
-    class EncoderRender(val videoPath:String) : TextureView.SurfaceTextureListener {
+    class EncoderRender(val videoPath: String) : TextureView.SurfaceTextureListener {
 
-        private var h264Decoder:H264Decoder? = null
+        private var h264Decoder: H264Decoder? = null
 
         override fun onSurfaceTextureAvailable(surface: SurfaceTexture, width: Int, height: Int) {
             thread {
@@ -132,4 +132,7 @@ class H264Activity : AppCompatActivity() {
 
     }
 
+    external fun findStartCode(buffer: ByteArray, offset: Int)
+
+    external fun parseH264Stream(url: String)
 }

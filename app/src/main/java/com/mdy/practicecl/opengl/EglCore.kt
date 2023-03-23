@@ -111,6 +111,16 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
     }
 
     /**
+     * 共享的EGLContext
+     * 如果设置EGL14.EGL_NO_CONTEXT表示非共享的EGLContext
+     * 在创建EGL环境时，可以设置共享的EGLContext，这样在共享的EGLContext中创建的纹理就可以在当前EGL下使用
+     */
+    fun getShareContext():EGLContext{
+
+        return mEGLContext
+    }
+
+    /**
      * 绑定上下文环境
      * 绑定上下文环境后，就可以执行具体的绘制操作，调用OpenGL相关的方法绘制图形
      * 注意：必须在切换到当前上下文后，才可以执行OpenGL的函数
@@ -152,7 +162,9 @@ class EglCore(shareEGLContext: EGLContext = EGL14.EGL_NO_CONTEXT) {
 
 
     fun releaseSurface(eglSurface: EGLSurface) {
-        EGL14.eglDestroySurface(mEGLDisplay, eglSurface)
+        if(mEGLDisplay != EGL14.EGL_NO_DISPLAY){
+            EGL14.eglDestroySurface(mEGLDisplay, eglSurface)
+        }
     }
 
 }

@@ -62,14 +62,17 @@ class H264Encoder(val outputFile: String) : Thread("H264Encoder-Thread") {
     }
 
 
-    private fun initConfig() {
-        val mediaFormat = MediaFormat.createVideoFormat(mMimeType, 1920, 1080)
+    /**
+     * 对于视频编码来说设置MediaFormat时主要有以下参数：颜色格式、码率、码率控制模式、帧率、I帧间隔
+     */
+    private fun initConfig(width :Int = 1920,height:Int = 1080) {
+        val mediaFormat = MediaFormat.createVideoFormat(mMimeType, width, height)
         // 选择对应的YUV4颜色格式
         mediaFormat.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible)
-        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30)
-        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE, 3000 * 1000)
+        mediaFormat.setInteger(MediaFormat.KEY_BIT_RATE,width * height * 5)
         mediaFormat.setInteger(MediaFormat.KEY_BITRATE_MODE,
             MediaCodecInfo.EncoderCapabilities.BITRATE_MODE_VBR)
+        mediaFormat.setInteger(MediaFormat.KEY_FRAME_RATE, 30)
         mediaFormat.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 2)
         mMediaCodec = MediaCodec.createEncoderByType(mMimeType)
         mMediaCodec.configure(mediaFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)

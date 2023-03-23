@@ -1,5 +1,7 @@
 package com.mdy.library_process
 
+import com.mdy.practicecl.IDataTransaction
+
 /**
  * User: maodayu
  * Date: 2023/3/14
@@ -8,5 +10,20 @@ package com.mdy.library_process
 object BinderProxyImpl {
 
 
+    class DataTransaction : IDataTransaction.Stub() {
+
+        override fun scheduleCreateService() {
+
+        }
+
+        override fun scheduleStartService() {
+
+        }
+
+        override fun scheduleStopService() {
+
+        }
+
+    }
 
 }

@@ -20,7 +20,7 @@ import kotlin.concurrent.thread
  * 注意权限问题
  */
 @SuppressLint("MissingPermission")
-class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) : Thread("Audio-Record-1") {
+class RecordUtil(val callback: AudioFrameCallback, val audioPath: String? = null) : Thread("Audio-Record-1") {
 
     private val TAG = "RecordUtil"
     private var isRecord = false
@@ -34,9 +34,9 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
      * 回音消除
      * audioRecord可以获取一个SessionId，在创建AudioTrack的时候可以传入
      */
-    private fun createAEC(){
+    private fun createAEC() {
         val audioSessionId = audioRecord?.audioSessionId
-        if(AcousticEchoCanceler.isAvailable() && audioSessionId != null){
+        if (AcousticEchoCanceler.isAvailable() && audioSessionId != null) {
             val acousticEchoCanceler = AcousticEchoCanceler.create(audioSessionId)
             acousticEchoCanceler.enabled = true
         }
@@ -52,7 +52,6 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
     }
 
     private fun initAudioRecord() {
-
 
 
         bufferSize = AudioRecord.getMinBufferSize(sampleRate,
@@ -72,7 +71,7 @@ class RecordUtil(val callback: AudioFrameCallback,val audioPath:String? = null) 
     private fun executeWriteAudio() {
         while (isRecord) {
             // 这里设置为4096和字节
-            val buf = ByteBuffer.allocateDirect(1024*4)
+            val buf = ByteBuffer.allocateDirect(1024 * 4)
             val len = audioRecord?.read(buf, buf.capacity()) ?: 0
             Log.i(TAG, "录音数据写入:  $len")
             if (len > 0 && len <= buf.capacity()) {
